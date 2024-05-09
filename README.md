@@ -26,3 +26,6 @@
 - [ ] Evaluation
     - [ ] Generalisierungs-performance
     - [ ] Vergleiche verschiedene Modelle
+
+## Fragen an die Tutoren
+- Wie ist das mit parallel processing auf dem bw uni cluster, wie bekommt man grafikkarten zugewiesen?
