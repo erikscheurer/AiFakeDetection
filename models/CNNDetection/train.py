@@ -2,57 +2,59 @@ import os
 import time
 import torch.nn
 from tensorboardX import SummaryWriter
+from tqdm import tqdm
 
-from validate import validate
 from datasets import create_dataloader
-from earlystop import EarlyStopping
+# from earlystop import EarlyStopping
 from models.CNNDetection.networks.trainer import Trainer
 from config import load_config
+from logger import Logger
 
 
 if __name__ == '__main__':
-    opt = load_config('models/CNNDetection/train.yaml')
+    config = load_config('models/CNNDetection/train.yaml')
 
     data_loader = create_dataloader(
-        data_path=opt.train.dataset.path,
-        dataset=opt.train.dataset.name,
+        data_path=config.train.dataset.path,
+        dataset=config.train.dataset.name,
         split='train',
-        batch_size=opt.train.opt.batch_size,
+        batch_size=config.train.batch_size,
     )
 
     dataset_size = len(data_loader)
     print('#training images = %d' % dataset_size)
 
-    train_writer = SummaryWriter(os.path.join(opt.checkpoints_dir, opt.name, "train"))
-    val_writer = SummaryWriter(os.path.join(opt.checkpoints_dir, opt.name, "val"))
+    logger = Logger(config)
 
-    model = Trainer(opt)
-    early_stopping = EarlyStopping(patience=opt.earlystop_epoch, delta=-0.001, verbose=True)
-    for epoch in range(opt.niter):
+    model = Trainer(config)
+    # early_stopping = EarlyStopping(patience=opt.earlystop_epoch, delta=-0.001, verbose=True)
+    for epoch in range(config.train.niter):
         epoch_start_time = time.time()
         iter_data_time = time.time()
         epoch_iter = 0
 
-        for i, data in enumerate(data_loader):
+        for i, data in tqdm(enumerate(data_loader), total=len(data_loader)):
             model.total_steps += 1
-            epoch_iter += opt.batch_size
+            epoch_iter += config.train.batch_size
 
             model.set_input(data)
-            model.optimize_parameters()
+            model_out = model.optimize_parameters()
+            output, loss = model_out['output'], model_out['loss']
 
-            if model.total_steps % opt.loss_freq == 0:
-                print("Train loss: {} at step: {}".format(model.loss, model.total_steps))
-                train_writer.add_scalar('loss', model.loss, model.total_steps)
+            if model.total_steps % config.train.loss_freq == 0:
+                logger.add_scalar('loss', model.loss, model.total_steps)
 
-            if model.total_steps % opt.save_latest_freq == 0:
+            if model.total_steps % config.train.save_img_freq == 0:
+                logger.log_images('train', model.input, model.label, model.output, model.total_steps)
+
+            if model.total_steps % config.train.save_latest_freq == 0:
                 print('saving the latest model %s (epoch %d, model.total_steps %d)' %
-                      (opt.name, epoch, model.total_steps))
+                      (config.name, epoch, model.total_steps))
                 model.save_networks('latest')
 
-            # print("Iter time: %d sec" % (time.time()-iter_data_time))
-            # iter_data_time = time.time()
+                
 
-        if epoch % opt.save_epoch_freq == 0:
+        if epoch % config.train.save_epoch_freq == 0:
             print('saving the model at the end of epoch %d, iters %d' %
                   (epoch, model.total_steps))
             model.save_networks('latest')

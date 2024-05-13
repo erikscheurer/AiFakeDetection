@@ -52,7 +52,7 @@ class BaseModel(nn.Module):
                         state[k] = v.to(self.device)
 
             for g in self.optimizer.param_groups:
-                g['lr'] = self.opt.lr
+                g['lr'] = self.opt.train.lr
 
     def eval(self):
         self.model.eval()

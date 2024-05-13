@@ -32,10 +32,10 @@ class TinyGenImageDataset(Dataset):
     
     def __getitem__(self, idx):
         if idx < len(self.aidata):
-            img = Image.open(self.aidata[idx])
-            return self.transform(img), 0
+            img = Image.open(self.aidata[idx]).convert("RGB")
+            return self.transform(img), 0 # 0 for ai
         else:
-            img = Image.open(self.realdata[idx-len(self.aidata)])
+            img = Image.open(self.realdata[idx-len(self.aidata)]).convert("RGB")
             return self.transform(img), 1
         
     def __repr__(self):

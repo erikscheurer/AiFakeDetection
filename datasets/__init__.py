@@ -4,9 +4,9 @@ from .dummy import DummyDataset
 from .tinyGenImage import TinyGenImageDataset
 
 def create_dataloader(data_path, dataset='timyGenImage', split='train', batch_size=32, num_workers=4, **kwargs):
-    if dataset == 'dummy':
+    if dataset.lower() == 'dummy':
         dataset = DummyDataset(data_path, **kwargs)
-    elif dataset == 'tinyGenImage':
+    elif dataset.lower() == 'tinygenimage':
         dataset = TinyGenImageDataset(data_path, **kwargs)
     else:
         raise ValueError(f"dataset {dataset} not found")

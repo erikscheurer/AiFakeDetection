@@ -12,29 +12,31 @@ class Trainer(BaseModel):
     def __init__(self, opt):
         super(Trainer, self).__init__(opt)
 
-        if self.isTrain and not opt.continue_train:
+        if self.isTrain and not opt.train.continue_train:
             self.model = resnet50(pretrained=True)
             self.model.fc = nn.Linear(2048, 1)
-            torch.nn.init.normal_(self.model.fc.weight.data, 0.0, opt.init_gain)
+            torch.nn.init.normal_(self.model.fc.weight.data, 0.0, 0.02)
 
-        if not self.isTrain or opt.continue_train:
+        if not self.isTrain or opt.train.continue_train:
             self.model = resnet50(num_classes=1)
 
         if self.isTrain:
             self.loss_fn = nn.BCEWithLogitsLoss()
             # initialize optimizers
-            if opt.optim == 'adam':
+            if opt.train.optim == 'adam':
                 self.optimizer = torch.optim.Adam(self.model.parameters(),
-                                                  lr=opt.lr, betas=(opt.beta1, 0.999))
-            elif opt.optim == 'sgd':
+                                                  lr=opt.train.lr, betas=(opt.train.beta1, 0.999))
+            elif opt.train.optim == 'sgd':
                 self.optimizer = torch.optim.SGD(self.model.parameters(),
-                                                 lr=opt.lr, momentum=0.0, weight_decay=0)
+                                                 lr=opt.train.lr, momentum=0.0, weight_decay=0)
             else:
                 raise ValueError("optim should be [adam, sgd]")
 
-        if not self.isTrain or opt.continue_train:
-            self.load_networks(opt.epoch)
-        self.model.to(opt.gpu_ids[0])
+        if not self.isTrain or opt.train.continue_train:
+            self.load_networks(opt.train.epoch)
+
+        self.device = torch.device('cuda:{}'.format(opt.gpu_ids[0])) if opt.gpu_ids else torch.device('cpu')
+        self.model.to(self.device)
 
 
     def adjust_learning_rate(self, min_lr=1e-6):
@@ -51,6 +53,7 @@ class Trainer(BaseModel):
 
     def forward(self):
         self.output = self.model(self.input)
+        return self.output
 
     def get_loss(self):
         return self.loss_fn(self.output.squeeze(1), self.label)
@@ -61,4 +64,7 @@ class Trainer(BaseModel):
         self.optimizer.zero_grad()
         self.loss.backward()
         self.optimizer.step()
+
+        return {"output": self.output, "loss": self.loss}
+
 
