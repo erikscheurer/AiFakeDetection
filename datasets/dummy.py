@@ -4,7 +4,7 @@ import torch
 from torch.utils.data import Dataset
 
 class DummyDataset(Dataset):
-    def __init__(self, n_samples=1000, shape=(3, 32, 32), n_classes=2):
+    def __init__(self, data_path, n_samples=1000, shape=(3, 32, 32), n_classes=2, split="train"):
         self.n_samples = n_samples
         self.shape = shape
         self.n_classes = n_classes
