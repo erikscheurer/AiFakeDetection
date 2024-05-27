@@ -20,28 +20,33 @@ class GenImageDataset(Dataset):
         self.realdata = []
 
         for generator in generators:
+            newaidata = []
+            newrealdata = []
             if generators_allowed is not None and any([gen.lower() not in generator.lower() for gen in generators_allowed]):
                 print(f"Skipping generator {generator}")
                 continue
 
             for file in glob.iglob(f"{data_path}/{generator}/{split}/ai/*.*"):
-                self.aidata.append(file)
+                newaidata.append(file)
             for file in glob.iglob(f"{data_path}/{generator}/{split}/nature/*.*"):
-                self.realdata.append(file)
+                newrealdata.append(file)
 
-            if len(self.aidata) == 0: # temporary fix for extracted data structure
+            if len(newaidata) == 0: # temporary fix for extracted data structure
                 for file in glob.iglob(f"{data_path}/{generator}/{generator}_extracted/{split}/ai/*.*"):
-                    self.aidata.append(file)
+                    newaidata.append(file)
                 for file in glob.iglob(f"{data_path}/{generator}/{generator}_extracted/{split}/nature/*.*"):
-                    self.realdata.append(file)
+                    newrealdata.append(file)
 
-            print(f"Found {len(self.aidata)} ai images and {len(self.realdata)} real images for generator {generator}")
-            if len(self.aidata) == 0:
-                raise ValueError(f"No ai images found for generator {generator}")
-            if len(self.realdata) == 0:
-                raise ValueError(f"No real images found for generator {generator}")
-            if len(self.aidata) != len(self.realdata):
-                raise ValueError(f"Number of ai images ({len(self.aidata)}) and real images ({len(self.realdata)}) do not match for generator {generator}")
+            self.aidata.extend(newaidata)
+            self.realdata.extend(newrealdata)
+
+            print(f"Found {len(newaidata)} ai images and {len(newrealdata)} real images for generator {generator}")
+        if len(self.aidata) == 0:
+            raise ValueError(f"No ai images found for generator {generator}")
+        if len(self.realdata) == 0:
+            raise ValueError(f"No real images found for generator {generator}")
+        if len(self.aidata) != len(self.realdata):
+            print(f"WARNING: Number of ai images ({len(self.aidata)}) and real images ({len(self.realdata)}) do not match for generator {generator}")
             
         if transform is not None:
             raise NotImplementedError("Custom transforms are not supported yet")
@@ -56,19 +61,27 @@ class GenImageDataset(Dataset):
     def __len__(self):
         return len(self.aidata)+len(self.realdata)
     
+    def try_to_load_image(self, path):
+        try:
+            return Image.open(path).convert("RGB")
+        except:
+            print(f"Could not load image {path}")
+            return None
+
+
     def __getitem__(self, idx):
         if idx < len(self.aidata):
-            img = Image.open(self.aidata[idx]).convert("RGB")
+            img = self.try_to_load_image(self.aidata[idx])
             return self.transform(img), 0 # 0 for ai
         else:
-            img = Image.open(self.realdata[idx-len(self.aidata)]).convert("RGB")
+            img = self.try_to_load_image(self.realdata[idx-len(self.aidata)])
             return self.transform(img), 1
         
     def __repr__(self):
         return f"GenImageDataset({len(self.aidata)} ai images, {len(self.realdata)} real images)"
     
 if __name__ == "__main__":
-    dataset = GenImageDataset("data/GenImage", generators_allowed=['BigGAN'])
+    dataset = GenImageDataset("data/GenImage")#, generators_allowed=['glide'])
     print(dataset)
     print(dataset[0][0].shape)
     import matplotlib.pyplot as plt
