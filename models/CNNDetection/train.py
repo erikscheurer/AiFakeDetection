@@ -19,10 +19,11 @@ if __name__ == '__main__':
         dataset=config.train.dataset.name,
         split='train',
         batch_size=config.train.batch_size,
+        num_workers=config.train.num_workers
     )
 
     dataset_size = len(data_loader)
-    print('#training images = %d' % dataset_size)
+    print(f'#training images = {dataset_size*config.train.batch_size}')
 
     logger = Logger(config)
 
@@ -43,6 +44,7 @@ if __name__ == '__main__':
 
             if model.total_steps % config.train.loss_freq == 0:
                 logger.add_scalar('loss', model.loss, model.total_steps)
+                logger.log_accuracy(model_out, model.label, model.total_steps, from_logits=True)
 
             if model.total_steps % config.train.save_img_freq == 0:
                 logger.log_images('train', model.input, model.label, model.output, model.total_steps)

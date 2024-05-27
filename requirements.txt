@@ -3,3 +3,5 @@ numpy
 matplotlib
 torchvision
 Pillow
+omegaconf
+tensorboardX

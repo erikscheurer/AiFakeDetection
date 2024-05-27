@@ -31,6 +31,16 @@ class Trainer(BaseModel):
                                                  lr=opt.train.lr, momentum=0.0, weight_decay=0)
             else:
                 raise ValueError("optim should be [adam, sgd]")
+        
+        # lr scheduler
+        if not hasattr(opt.train, 'lr_policy') or opt.train.lr_policy == 'constant':
+            self.lr_scheduler = torch.optim.lr_scheduler.ConstantLR(self.optimizer)
+        elif opt.train.lr_policy == 'step':
+            self.lr_scheduler = torch.optim.lr_scheduler.StepLR(self.optimizer, step_size=opt.train.lr_decay_epoch, gamma=0.1)
+        elif opt.train.lr_policy == 'plateau':
+            self.lr_scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(self.optimizer, mode='min', factor=0.1, patience=opt.train.lr_decay_epoch, verbose=True)
+        else:
+            raise ValueError("Unknown lr policy")
 
         if not self.isTrain or opt.train.continue_train:
             self.load_networks(opt.train.epoch)
@@ -64,6 +74,7 @@ class Trainer(BaseModel):
         self.optimizer.zero_grad()
         self.loss.backward()
         self.optimizer.step()
+        self.lr_scheduler.step()
 
         return {"output": self.output, "loss": self.loss}
 

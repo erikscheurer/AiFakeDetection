@@ -2,6 +2,7 @@ from tensorboardX import SummaryWriter
 import time
 import matplotlib.pyplot as plt
 import os
+import torch
 
 class Logger:
     def __init__(self, opt):
@@ -18,6 +19,20 @@ class Logger:
             self.val_writer.add_scalar(tag, scalar_value, global_step, walltime)
         else:
             raise ValueError("writer should be 'train' or 'val'")
+        
+    def calc_accuracy(self, model_out, labels, from_logits=False):
+        if from_logits:
+            predictions = torch.round(torch.sigmoid(model_out['output'].squeeze()))
+        else:
+            assert all(model_out['output'] >= 0) and all(model_out['output'] <= 1), "output should be in [0,1], if not from logits. Did you forget to apply sigmoid or not specify from_logits=True?"
+            predictions = torch.round(model_out['output'].squeeze())
+        assert predictions.shape == labels.shape
+        correct = predictions == labels
+        return correct.float().mean()
+    
+    def log_accuracy(self, model_out, labels, global_step=None, walltime=None, writer='train', from_logits=False):
+        accuracy = self.calc_accuracy(model_out, labels, from_logits)
+        self.add_scalar('accuracy', accuracy, global_step, walltime, writer)
 
     def close(self):
         self.train_writer.close()
@@ -28,14 +43,15 @@ class Logger:
         labels = labels.cpu().detach().numpy()
         predictions = predictions.cpu().detach().numpy()
         n_img = min(self.n_img_to_log, images.shape[0])
-        fig,axes = plt.subplots(2, n_img, figsize=(20,20))
+        fig,axes = plt.subplots(2, n_img)
         for i in range(n_img):
             axes[0,i].imshow(images[i].transpose(1,2,0))
-            axes[0,i].set_title(f"Label: {"AI" if labels[i] == 0 else "Nature"}")
+            axes[0,i].set_title(f"Label: {'AI' if labels[i] == 0 else 'Nature'}")
             axes[0,i].axis('off')
             # plot predictions probability of 0,1
-            axes[1,i].bar([0,1], predictions[i])
+            axes[1,i].bar([0,1], [1-predictions[i].item(), predictions[i].item()])
             axes[1,i].set_xticks([0,1])
+            axes[1,i].set_xticklabels(['AI', 'Nature'])
             axes[1,i].set_ylim(0,1)
             axes[1,i].set_title("Predictions")
         plt.tight_layout()
@@ -46,3 +62,4 @@ class Logger:
             self.val_writer.add_figure(tag, fig, global_step, walltime)
         else:
             raise ValueError("writer should be 'train' or 'val'")
+        plt.close(fig)

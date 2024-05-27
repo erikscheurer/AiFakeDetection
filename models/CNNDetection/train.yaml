@@ -6,8 +6,8 @@ output_dir: output/CNNDetection/
 
 train:
   dataset:
-    name: TinyGenImage
-    path: data/TinyGenImage
+    name: GenImage
+    path: data/GenImage
   earlystop_epoch: 5
   data_aug: False
   optim: adam
@@ -25,4 +25,7 @@ train:
   niter: 10000
   beta1: 0.9
   lr: 0.0001
+  lr_policy: step
+  lr_decay_epoch: 10000
   batch_size: 32
+  num_workers: 10

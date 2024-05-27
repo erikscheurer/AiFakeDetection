@@ -1,13 +1,13 @@
 import torch
 
 from .dummy import DummyDataset
-from .tinyGenImage import TinyGenImageDataset
+from .GenImage import GenImageDataset
 
 def create_dataloader(data_path, dataset='timyGenImage', split='train', batch_size=32, num_workers=4, **kwargs):
-    if dataset.lower() == 'dummy':
+    if dataset.lower() == 'dummy' or dataset.lower() == 'random':
         dataset = DummyDataset(data_path, **kwargs)
-    elif dataset.lower() == 'tinygenimage':
-        dataset = TinyGenImageDataset(data_path, **kwargs)
+    elif dataset.lower() == 'genimage':
+        dataset = GenImageDataset(data_path, **kwargs)
     else:
         raise ValueError(f"dataset {dataset} not found")
     

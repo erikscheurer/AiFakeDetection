@@ -28,4 +28,20 @@
     - [ ] Vergleiche verschiedene Modelle
 
 ## Fragen an die Tutoren
-- Wie ist das mit parallel processing auf dem bw uni cluster, wie bekommt man grafikkarten zugewiesen?
+- [x] Wie ist das mit parallel processing auf dem bw uni cluster, wie bekommt man grafikkarten zugewiesen? -> partition gpu_4 oder gpu_8 und dann --gres=gpu:1
+
+## Setup
+
+- man braucht auf bwuni cluster einen workspace, dann verlinken mit `ln -s /path/to/your/workspace/ ~/aacv_ws`
+- in workspace `git clone <this repo>`
+- verlinken zu home `ln -s $(pwd)/AiFakeDetection/ ~/AiFakeDetection`
+
+### python venv
+
+```bash
+module devel/python/3.11.7_intel_2021.4.0
+python -m venv aacv_venv
+ln -s $(pwd)/aacv_venv/ ~/aacv_venv
+source ~/aacv_venv/bin/activate
+pip install -r ~/AiFakeDetection/requirements.txt
+```
