@@ -19,6 +19,19 @@ class GenImageDataset(Dataset):
         self.aidata = []
         self.realdata = []
 
+        exclude_files = [
+            'data/GenImage/stable_diffusion_v_1_4/stable_diffusion_v_1_4_extracted/train/ai/033_sdv4_00137.png',
+            'data/GenImage/stable_diffusion_v_1_4/stable_diffusion_v_1_4_extracted/train/ai/033_sdv4_00134.png',
+            'data/GenImage/stable_diffusion_v_1_4/stable_diffusion_v_1_4_extracted/train/ai/033_sdv4_00152.png',
+            'data/GenImage/Midjourney/imagenet_midjourney/train/ai/208_midjourney_76.png',
+            'data/GenImage/Midjourney/imagenet_midjourney/train/ai/208_midjourney_92.png',
+            'data/GenImage/Midjourney/imagenet_midjourney/train/ai/208_midjourney_91.png',
+            'data/GenImage/BigGAN/BigGAN_extracted/train/ai/116_biggan_00107.png',
+            'data/GenImage/BigGAN/BigGAN_extracted/train/ai/116_biggan_00094.png',
+            'data/GenImage/BigGAN/BigGAN_extracted/train/ai/116_biggan_00081.png',
+            'data/GenImage/BigGAN/BigGAN_extracted/train/ai/116_biggan_00098.png',
+        ]
+
         for generator in generators:
             newaidata = []
             newrealdata = []
@@ -39,6 +52,9 @@ class GenImageDataset(Dataset):
 
             self.aidata.extend(newaidata)
             self.realdata.extend(newrealdata)
+
+            # remove files that are not images
+            self.aidata = [file for file in self.aidata if file not in exclude_files]
 
             print(f"Found {len(newaidata)} ai images and {len(newrealdata)} real images for generator {generator}")
         if len(self.aidata) == 0:
@@ -81,7 +97,7 @@ class GenImageDataset(Dataset):
         return f"GenImageDataset({len(self.aidata)} ai images, {len(self.realdata)} real images)"
     
 if __name__ == "__main__":
-    dataset = GenImageDataset("data/GenImage")#, generators_allowed=['glide'])
+    dataset = GenImageDataset("'data/GenImage")#, generators_allowed=['glide'])',
     print(dataset)
     print(dataset[0][0].shape)
     import matplotlib.pyplot as plt

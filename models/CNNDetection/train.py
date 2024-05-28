@@ -44,7 +44,7 @@ if __name__ == '__main__':
 
             if model.total_steps % config.train.loss_freq == 0:
                 logger.add_scalar('loss', model.loss, model.total_steps)
-                logger.log_accuracy(model_out, model.label, model.total_steps, from_logits=True)
+                logger.log_accuracy(output, model.label, model.total_steps, from_logits=True)
 
             if model.total_steps % config.train.save_img_freq == 0:
                 logger.log_images('train', model.input, model.label, model.output, model.total_steps)

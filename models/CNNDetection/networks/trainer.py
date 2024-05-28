@@ -77,5 +77,3 @@ class Trainer(BaseModel):
         self.lr_scheduler.step()
 
         return {"output": self.output, "loss": self.loss}
-
-

@@ -43,7 +43,7 @@ class Trainer():
         self.optimizer.zero_grad()
         self.loss.backward()
         self.optimizer.step()
-        return self.loss
+        return self.loss, stu_cla
 
     def save(self, path):
         torch.save(self.model.state_dict(), path)

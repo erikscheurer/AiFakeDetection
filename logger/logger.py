@@ -11,6 +11,7 @@ class Logger:
         self.train_writer = SummaryWriter(name)
         self.val_writer = SummaryWriter(name.replace("train", "val"))
         self.n_img_to_log = opt.train.n_img_to_log
+        self.save_img_freq = opt.train.save_img_freq
 
     def add_scalar(self, tag, scalar_value, global_step=None, walltime=None, writer='train'):
         if writer == 'train':
@@ -20,18 +21,18 @@ class Logger:
         else:
             raise ValueError("writer should be 'train' or 'val'")
         
-    def calc_accuracy(self, model_out, labels, from_logits=False):
+    def calc_accuracy(self, output, labels, from_logits=False):
         if from_logits:
-            predictions = torch.round(torch.sigmoid(model_out['output'].squeeze()))
+            predictions = torch.round(torch.sigmoid(output.squeeze()))
         else:
-            assert all(model_out['output'] >= 0) and all(model_out['output'] <= 1), "output should be in [0,1], if not from logits. Did you forget to apply sigmoid or not specify from_logits=True?"
-            predictions = torch.round(model_out['output'].squeeze())
+            assert all(output >= 0) and all(output <= 1), "output should be in [0,1], if not from logits. Did you forget to apply sigmoid or not specify from_logits=True?"
+            predictions = torch.round(output.squeeze())
         assert predictions.shape == labels.shape
         correct = predictions == labels
         return correct.float().mean()
     
-    def log_accuracy(self, model_out, labels, global_step=None, walltime=None, writer='train', from_logits=False):
-        accuracy = self.calc_accuracy(model_out, labels, from_logits)
+    def log_accuracy(self, output, labels, global_step=None, walltime=None, writer='train', from_logits=False):
+        accuracy = self.calc_accuracy(output, labels, from_logits)
         self.add_scalar('accuracy', accuracy, global_step, walltime, writer)
 
     def close(self):
@@ -39,6 +40,8 @@ class Logger:
         self.val_writer.close()
 
     def log_images(self, tag, images, labels, predictions, global_step=None, walltime=None, writer='train'):
+        if global_step % self.save_img_freq != 0:
+            return
         images = images.cpu().detach().numpy()
         labels = labels.cpu().detach().numpy()
         predictions = predictions.cpu().detach().numpy()

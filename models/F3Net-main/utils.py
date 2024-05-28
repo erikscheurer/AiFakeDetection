@@ -9,21 +9,15 @@ import sys
 import logging
 
 
-def evaluate_tinyGenImage(model, data_path, generators = None, split = 'val'):
-    from tinyGenImage import TinyGenImageDataset
-    dataset_img = TinyGenImageDataset(data_path, split=split, generators_allowed=generators, target_size=(299, 299))
+def evaluate_GenImage(model, data_path, generators = None, split = 'val'):
+    from datasets import create_dataloader
 
     bz = 64
     # torch.cache.empty_cache()
     with torch.no_grad():
         y_true, y_pred = [], []
 
-        dataloader = torch.utils.data.DataLoader(
-            dataset = dataset_img,
-            batch_size = bz,
-            shuffle = True,
-            num_workers = 8
-        )
+        dataloader = create_dataloader(data_path, 'GenImage', split, bz, num_workers=4, target_size=(299,299))
         for img, label in dataloader:
             img = img.detach().cuda()
             output = model.forward(img)
