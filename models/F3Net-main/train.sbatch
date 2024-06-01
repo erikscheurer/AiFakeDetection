@@ -36,4 +36,4 @@ python -c "import torch; print(torch.cuda.is_available())"
 echo $PYTHONPATH
 
 # run the script
-python3 models/CNNDetection/train.py
+python3 models/F3Net-main/train.py

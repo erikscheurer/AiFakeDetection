@@ -23,9 +23,9 @@ class GenImageDataset(Dataset):
             'data/GenImage/stable_diffusion_v_1_4/stable_diffusion_v_1_4_extracted/train/ai/033_sdv4_00137.png',
             'data/GenImage/stable_diffusion_v_1_4/stable_diffusion_v_1_4_extracted/train/ai/033_sdv4_00134.png',
             'data/GenImage/stable_diffusion_v_1_4/stable_diffusion_v_1_4_extracted/train/ai/033_sdv4_00152.png',
-            'data/GenImage/Midjourney/imagenet_midjourney/train/ai/208_midjourney_76.png',
-            'data/GenImage/Midjourney/imagenet_midjourney/train/ai/208_midjourney_92.png',
-            'data/GenImage/Midjourney/imagenet_midjourney/train/ai/208_midjourney_91.png',
+            'data/GenImage/Midjourney/Midjourney_extracted/train/ai/208_midjourney_76.png',
+            'data/GenImage/Midjourney/Midjourney_extracted/train/ai/208_midjourney_92.png',
+            'data/GenImage/Midjourney/Midjourney_extracted/train/ai/208_midjourney_91.png',
             'data/GenImage/BigGAN/BigGAN_extracted/train/ai/116_biggan_00107.png',
             'data/GenImage/BigGAN/BigGAN_extracted/train/ai/116_biggan_00094.png',
             'data/GenImage/BigGAN/BigGAN_extracted/train/ai/116_biggan_00081.png',
@@ -67,9 +67,10 @@ class GenImageDataset(Dataset):
         if transform is not None:
             raise NotImplementedError("Custom transforms are not supported yet")
 
+        self.target_size = target_size
         self.transform = Compose([
             # RandomResizedCrop(target_size),
-            Resize(target_size),
+            Resize(self.target_size),
             ToImage(),
             ToDtype(torch.float32, scale=True)
         ])
@@ -82,7 +83,7 @@ class GenImageDataset(Dataset):
             return Image.open(path).convert("RGB")
         except:
             print(f"Could not load image {path}")
-            return None
+            return Image.new("RGB", self.target_size)
 
 
     def __getitem__(self, idx):
