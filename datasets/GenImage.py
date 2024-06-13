@@ -33,6 +33,9 @@ class GenImageDataset(Dataset):
         ]
 
         for generator in generators:
+            if not os.path.isdir(f"{data_path}/{generator}"):
+                continue
+            
             newaidata = []
             newrealdata = []
             if generators_allowed is not None and any([gen.lower() not in generator.lower() for gen in generators_allowed]):
@@ -57,6 +60,7 @@ class GenImageDataset(Dataset):
             self.aidata = [file for file in self.aidata if file not in exclude_files]
 
             print(f"Found {len(newaidata)} ai images and {len(newrealdata)} real images for generator {generator}")
+
         if len(self.aidata) == 0:
             raise ValueError(f"No ai images found for generator {generator}")
         if len(self.realdata) == 0:
@@ -98,7 +102,7 @@ class GenImageDataset(Dataset):
         return f"GenImageDataset({len(self.aidata)} ai images, {len(self.realdata)} real images)"
     
 if __name__ == "__main__":
-    dataset = GenImageDataset("'data/GenImage")#, generators_allowed=['glide'])',
+    dataset = GenImageDataset("data/GenImage")#, generators_allowed=['glide'])',
     print(dataset)
     print(dataset[0][0].shape)
     import matplotlib.pyplot as plt

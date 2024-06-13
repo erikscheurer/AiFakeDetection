@@ -8,8 +8,9 @@ import os
 
 
 def initModel(mod, gpu_ids):
-    mod = mod.to(f'cuda:{gpu_ids[0]}')
-    mod = nn.DataParallel(mod, gpu_ids)
+    if gpu_ids:
+        mod = mod.to(f'cuda:{gpu_ids[0]}')
+        mod = nn.DataParallel(mod, gpu_ids)
     return mod
 
 class Trainer(): 

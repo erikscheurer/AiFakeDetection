@@ -26,6 +26,7 @@ class BaseModel(nn.Module):
             'total_steps' : self.total_steps,
         }
 
+        os.makedirs(self.save_dir, exist_ok=True)
         torch.save(state_dict, save_path)
 
     # load models from the disk

@@ -73,7 +73,7 @@ for i in range(len(grayscale_cam)):
     visualization = show_cam_on_image(inputs[i].permute(1, 2, 0).numpy(), curr)
     visualizations.append(visualization)
 
-plt.figure(figsize=(20, 20))
+plt.figure(figsize=(23, 20))
 for i in range(10):
     plt.subplot(2, 5, i+1)
     plt.imshow(visualizations[i])

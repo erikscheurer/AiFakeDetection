@@ -1,7 +1,6 @@
 import os
 import time
 import torch.nn
-from tensorboardX import SummaryWriter
 from tqdm import tqdm
 
 from datasets import create_dataloader
@@ -45,6 +44,7 @@ if __name__ == '__main__':
             if model.total_steps % config.train.loss_freq == 0:
                 logger.add_scalar('loss', model.loss, model.total_steps)
                 logger.log_accuracy(output, model.label, model.total_steps, from_logits=True)
+                logger.add_scalar('lr', model.optimizer.param_groups[0]['lr'], model.total_steps)
 
             if model.total_steps % config.train.save_img_freq == 0:
                 logger.log_images('train', model.input, model.label, model.output, model.total_steps)

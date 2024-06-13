@@ -1,7 +1,7 @@
 name: CNNDetection
 isTrain: True
 gpu_ids:  #[0]
-checkpoints_dir: checkpoints
+checkpoints_dir: output/CNNDetection/checkpoints
 output_dir: output/CNNDetection/
 
 train:

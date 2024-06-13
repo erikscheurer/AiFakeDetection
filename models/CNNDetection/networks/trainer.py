@@ -49,13 +49,6 @@ class Trainer(BaseModel):
         self.model.to(self.device)
 
 
-    def adjust_learning_rate(self, min_lr=1e-6):
-        for param_group in self.optimizer.param_groups:
-            param_group['lr'] /= 10.
-            if param_group['lr'] < min_lr:
-                return False
-        return True
-
     def set_input(self, input):
         self.input = input[0].to(self.device)
         self.label = input[1].to(self.device).float()
