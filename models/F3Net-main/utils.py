@@ -7,19 +7,22 @@ from sklearn.metrics import roc_curve
 from sklearn.metrics import auc as cal_auc
 import sys
 import logging
+from tqdm import tqdm
 
 
-def evaluate_GenImage(model, data_path, generators = None, split = 'val'):
+def evaluate_GenImage(model, data_path, generators = None, split = 'val', batch_size = 64, val_size = 1000):
     from datasets import create_dataloader
 
-    bz = 64
     # torch.cache.empty_cache()
     with torch.no_grad():
         y_true, y_pred = [], []
 
-        dataloader = create_dataloader(data_path, 'GenImage', split, bz, num_workers=4, target_size=(299,299))
-        for img, label in dataloader:
-            img = img.detach().cuda()
+        dataloader = create_dataloader(data_path, 'GenImage', split, batch_size, num_workers=4, shuffle=True, target_size=(299,299), generators_allowed=generators)
+        for i,(img, label) in enumerate(tqdm(dataloader)):
+
+            if i>=val_size:
+                break
+            img = img.detach().to(model.device)
             output = model.forward(img)
             y_pred.extend(output.sigmoid().flatten().tolist())
             y_true.extend(label.flatten().tolist())
@@ -31,10 +34,14 @@ def evaluate_GenImage(model, data_path, generators = None, split = 'val'):
     idx_real = np.where(y_true==0)[0]
     idx_fake = np.where(y_true==1)[0]
 
+    assert len(idx_real) > 0, f"No real images found: {y_true}"
+    assert len(idx_fake) > 0, f"No fake images found: {y_true}"
+
     r_acc = accuracy_score(y_true[idx_real], y_pred[idx_real] > 0.5)
     f_acc = accuracy_score(y_true[idx_fake], y_pred[idx_fake] > 0.5)
 
-    return AUC, r_acc, f_acc
+    overall_acc = accuracy_score(y_true, y_pred > 0.5)
+    return AUC, r_acc, f_acc, overall_acc
 
 
 # python 3.7

@@ -15,8 +15,8 @@ class BaseModel(nn.Module):
         self.save_dir = os.path.join(opt.checkpoints_dir, opt.name)
         self.device = torch.device('cuda:{}'.format(opt.gpu_ids[0])) if opt.gpu_ids else torch.device('cpu')
 
-    def save_networks(self, epoch):
-        save_filename = 'model_epoch_%s.pth' % epoch
+    def save_networks(self, epoch, unique=None):
+        save_filename = f'{unique}_model_epoch_{epoch}.pth' if unique else f'model_epoch_{epoch}.pth'
         save_path = os.path.join(self.save_dir, save_filename)
 
         # serialize model and optimizer to dict

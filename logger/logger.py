@@ -5,9 +5,10 @@ import os
 import torch
 
 class Logger:
-    def __init__(self, opt):
+    def __init__(self, opt, unique=''):
         self.output_dir = opt.output_dir
-        name = os.path.join(opt.output_dir, "train", opt.name+time.strftime("%Y-%m-%d_%H-%M-%S"))
+        self.start_time = time.strftime("%Y-%m-%d_%H-%M-%S")
+        name = os.path.join(opt.output_dir, "train", opt.name+self.start_time+unique)
         self.train_writer = SummaryWriter(name)
         self.val_writer = SummaryWriter(name.replace("train", "val"))
         self.n_img_to_log = opt.train.n_img_to_log

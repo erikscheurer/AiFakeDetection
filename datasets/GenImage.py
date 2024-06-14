@@ -20,16 +20,16 @@ class GenImageDataset(Dataset):
         self.realdata = []
 
         exclude_files = [
-            'data/GenImage/stable_diffusion_v_1_4/stable_diffusion_v_1_4_extracted/train/ai/033_sdv4_00137.png',
-            'data/GenImage/stable_diffusion_v_1_4/stable_diffusion_v_1_4_extracted/train/ai/033_sdv4_00134.png',
-            'data/GenImage/stable_diffusion_v_1_4/stable_diffusion_v_1_4_extracted/train/ai/033_sdv4_00152.png',
-            'data/GenImage/Midjourney/Midjourney_extracted/train/ai/208_midjourney_76.png',
-            'data/GenImage/Midjourney/Midjourney_extracted/train/ai/208_midjourney_92.png',
-            'data/GenImage/Midjourney/Midjourney_extracted/train/ai/208_midjourney_91.png',
-            'data/GenImage/BigGAN/BigGAN_extracted/train/ai/116_biggan_00107.png',
-            'data/GenImage/BigGAN/BigGAN_extracted/train/ai/116_biggan_00094.png',
-            'data/GenImage/BigGAN/BigGAN_extracted/train/ai/116_biggan_00081.png',
-            'data/GenImage/BigGAN/BigGAN_extracted/train/ai/116_biggan_00098.png',
+            './data/GenImage/stable_diffusion_v_1_4/stable_diffusion_v_1_4_extracted/train/ai/033_sdv4_00137.png',
+            './data/GenImage/stable_diffusion_v_1_4/stable_diffusion_v_1_4_extracted/train/ai/033_sdv4_00134.png',
+            './data/GenImage/stable_diffusion_v_1_4/stable_diffusion_v_1_4_extracted/train/ai/033_sdv4_00152.png',
+            './data/GenImage/Midjourney/Midjourney_extracted/train/ai/208_midjourney_76.png',
+            './data/GenImage/Midjourney/Midjourney_extracted/train/ai/208_midjourney_92.png',
+            './data/GenImage/Midjourney/Midjourney_extracted/train/ai/208_midjourney_91.png',
+            './data/GenImage/BigGAN/BigGAN_extracted/train/ai/116_biggan_00107.png',
+            './data/GenImage/BigGAN/BigGAN_extracted/train/ai/116_biggan_00094.png',
+            './data/GenImage/BigGAN/BigGAN_extracted/train/ai/116_biggan_00081.png',
+            './data/GenImage/BigGAN/BigGAN_extracted/train/ai/116_biggan_00098.png',
         ]
 
         for generator in generators:
@@ -38,20 +38,20 @@ class GenImageDataset(Dataset):
             
             newaidata = []
             newrealdata = []
-            if generators_allowed is not None and any([gen.lower() not in generator.lower() for gen in generators_allowed]):
+            if generators_allowed is not None and generator not in generators_allowed:
                 print(f"Skipping generator {generator}")
                 continue
 
             for file in glob.iglob(f"{data_path}/{generator}/{split}/ai/*.*"):
-                newaidata.append(file)
+                newaidata.append(file.replace("//", "/"))
             for file in glob.iglob(f"{data_path}/{generator}/{split}/nature/*.*"):
-                newrealdata.append(file)
+                newrealdata.append(file.replace("//", "/"))
 
             if len(newaidata) == 0: # temporary fix for extracted data structure
                 for file in glob.iglob(f"{data_path}/{generator}/{generator}_extracted/{split}/ai/*.*"):
-                    newaidata.append(file)
+                    newaidata.append(file.replace("//", "/"))
                 for file in glob.iglob(f"{data_path}/{generator}/{generator}_extracted/{split}/nature/*.*"):
-                    newrealdata.append(file)
+                    newrealdata.append(file.replace("//", "/"))
 
             self.aidata.extend(newaidata)
             self.realdata.extend(newrealdata)
@@ -59,14 +59,14 @@ class GenImageDataset(Dataset):
             # remove files that are not images
             self.aidata = [file for file in self.aidata if file not in exclude_files]
 
-            print(f"Found {len(newaidata)} ai images and {len(newrealdata)} real images for generator {generator}")
+            print(f"Found {len(newaidata)} ai images and {len(newrealdata)} real images")
 
         if len(self.aidata) == 0:
             raise ValueError(f"No ai images found for generator {generator}")
         if len(self.realdata) == 0:
             raise ValueError(f"No real images found for generator {generator}")
         if len(self.aidata) != len(self.realdata):
-            print(f"WARNING: Number of ai images ({len(self.aidata)}) and real images ({len(self.realdata)}) do not match for generator {generator}")
+            print(f"WARNING: Number of ai images ({len(self.aidata)}) and real images ({len(self.realdata)}) do not match")
             
         if transform is not None:
             raise NotImplementedError("Custom transforms are not supported yet")
@@ -89,7 +89,6 @@ class GenImageDataset(Dataset):
             print(f"Could not load image {path}")
             return Image.new("RGB", self.target_size)
 
-
     def __getitem__(self, idx):
         if idx < len(self.aidata):
             img = self.try_to_load_image(self.aidata[idx])
@@ -100,9 +99,11 @@ class GenImageDataset(Dataset):
         
     def __repr__(self):
         return f"GenImageDataset({len(self.aidata)} ai images, {len(self.realdata)} real images)"
-    
+
+
+
 if __name__ == "__main__":
-    dataset = GenImageDataset("data/GenImage")#, generators_allowed=['glide'])',
+    dataset = GenImageDataset("data/GenImage",split='val')#, generators_allowed=['glide'])',
     print(dataset)
     print(dataset[0][0].shape)
     import matplotlib.pyplot as plt

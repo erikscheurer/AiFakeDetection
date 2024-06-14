@@ -1,0 +1,16 @@
+output_dir: ./output/F3Net
+name: F3Net
+train:
+  n_img_to_log: 10
+  save_img_freq: 100
+dataset_path: ./data/GenImage/
+pretrained_path: ./models/F3Net-main/pretrained/xception-b5690688.pth
+batch_size: 12
+mode: FAD
+max_epoch: 5
+generators: null
+model_save_path: ./output/F3Net/checkpoints/
+loss_freq: 40
+model_save_freq: 100
+epoch_size: 10000
+val_size: 1000

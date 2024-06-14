@@ -8,6 +8,7 @@ train:
   dataset:
     name: GenImage
     path: data/GenImage
+    leave_out: 0
   earlystop_epoch: 5
   data_aug: False
   optim: adam
@@ -19,6 +20,8 @@ train:
   n_img_to_log: 5
   continue_train: False
   epoch_count: 10
+  epoch_size: 10000
+  val_size: 1000
   last_epoch: -1
   train_split: train
   val_split: val

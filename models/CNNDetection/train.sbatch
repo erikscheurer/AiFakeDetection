@@ -5,9 +5,9 @@
 #SBATCH --ntasks-per-node=1
 
 # d-hh:mm:ss
-#SBATCH --time=0-20:00:00
+#SBATCH --time=0-00:10:00
 
-#SBATCH --partition=gpu_4 # single, gpu_4, gpu_8
+#SBATCH --partition=dev_gpu_4 # single, gpu_4, gpu_8
 
 ##SBATCH --mem=4000
 
@@ -20,7 +20,7 @@
 ##SBATCH --mail-type=END,FAIL
 
 # output name 
-#SBATCH --output="output/cv_job_%j.out"
+#SBATCH --output="output/ResNet_%j.out"
 
 # same srun: srun --nodes=1 --ntasks-per-node=1 --gres=gpu:2 --partition=gpu_4 --time=0-01:00:00 --pty bash
 
@@ -36,4 +36,5 @@ python -c "import torch; print(torch.cuda.is_available())"
 echo $PYTHONPATH
 
 # run the script
-python3 models/CNNDetection/train.py
+echo "Running the script with leave out: $1"
+python3 models/CNNDetection/train.py --extra_opts config.train.dataset.leave_out=$1

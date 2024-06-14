@@ -20,7 +20,7 @@
 ##SBATCH --mail-type=END,FAIL
 
 # output name 
-#SBATCH --output="output/cv_job_%j.out"
+#SBATCH --output="output/F3Net_%j.out"
 
 # same srun: srun --nodes=1 --ntasks-per-node=1 --gres=gpu:2 --partition=gpu_4 --time=0-01:00:00 --pty bash
 
@@ -36,4 +36,5 @@ python -c "import torch; print(torch.cuda.is_available())"
 echo $PYTHONPATH
 
 # run the script
-python3 models/F3Net-main/train.py
+echo "Running the script with leave out: $1"
+python3 models/F3Net-main/train.py  --extra_opts config.train.dataset.leave_out=$1

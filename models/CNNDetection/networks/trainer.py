@@ -2,7 +2,7 @@ import functools
 import torch
 import torch.nn as nn
 from networks.resnet import resnet50
-from networks.base_model import BaseModel, init_weights
+from networks.base_model import BaseModel
 
 
 class Trainer(BaseModel):
@@ -54,7 +54,9 @@ class Trainer(BaseModel):
         self.label = input[1].to(self.device).float()
 
 
-    def forward(self):
+    def forward(self, inputs=None):
+        if inputs is not None:
+            self.input = inputs.to(self.device)
         self.output = self.model(self.input)
         return self.output
 
