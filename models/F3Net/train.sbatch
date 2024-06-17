@@ -37,4 +37,4 @@ echo $PYTHONPATH
 
 # run the script
 echo "Running the script with leave out: $1"
-python3 models/F3Net-main/train.py  --extra_opts config.train.dataset.leave_out=$1
+python3 models/F3Net/train.py  --extra_opts config.train.dataset.leave_out=$1

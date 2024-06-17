@@ -16,7 +16,7 @@ from tqdm import tqdm
 
 
 if __name__ == '__main__':
-    opt = load_config('models/F3Net-main/train.yaml')
+    opt = load_config('models/F3Net/train.yaml')
     generators = available_generators(opt.dataset_path)
     leave_out = generators.pop(opt.train.dataset.leave_out)
 

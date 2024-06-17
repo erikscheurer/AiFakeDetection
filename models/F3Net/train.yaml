@@ -4,7 +4,7 @@ train:
   n_img_to_log: 10
   save_img_freq: 100
 dataset_path: ./data/GenImage/
-pretrained_path: ./models/F3Net-main/pretrained/xception-b5690688.pth
+pretrained_path: ./models/F3Net/pretrained/xception-b5690688.pth
 batch_size: 12
 mode: FAD
 max_epoch: 5
