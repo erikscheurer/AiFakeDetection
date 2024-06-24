@@ -5,6 +5,20 @@ from PIL import Image
 import os
 import glob
 
+
+generator_dict = {
+    "ImageNet": -1,
+    "ADM": 0,
+    "BigGan": 1,
+    "glide": 2,
+    "Midjourney": 3,
+    "stable_diffusion_v_1_4": 4,
+    "stable_diffusion_v_1_5": 5,
+    "VQDM": 6,
+    "wukong": 7
+}
+
+
 class GenImageDataset(Dataset):
     def __init__(self, data_path, split="train", transform=None, target_size=(128,128), generators_allowed: list = None):
         """
@@ -18,6 +32,7 @@ class GenImageDataset(Dataset):
         generators = os.listdir(data_path)
         self.aidata = []
         self.realdata = []
+        self.generatortype = []
 
         exclude_files = [
             './data/GenImage/stable_diffusion_v_1_4/stable_diffusion_v_1_4_extracted/train/ai/033_sdv4_00137.png',
@@ -38,25 +53,32 @@ class GenImageDataset(Dataset):
             
             newaidata = []
             newrealdata = []
+            newgeneratortype = [] 
             if generators_allowed is not None and generator not in generators_allowed:
                 print(f"Skipping generator {generator}")
                 continue
 
             for file in glob.iglob(f"{data_path}/{generator}/{split}/ai/*.*"):
                 newaidata.append(file.replace("//", "/"))
+                newgeneratortype.append(generator_dict[generator])
             for file in glob.iglob(f"{data_path}/{generator}/{split}/nature/*.*"):
                 newrealdata.append(file.replace("//", "/"))
+                newgeneratortype.append(generator_dict["ImageNet"])
 
             if len(newaidata) == 0: # temporary fix for extracted data structure
                 for file in glob.iglob(f"{data_path}/{generator}/{generator}_extracted/{split}/ai/*.*"):
                     newaidata.append(file.replace("//", "/"))
+                    newgeneratortype.append(generator_dict[generator])
                 for file in glob.iglob(f"{data_path}/{generator}/{generator}_extracted/{split}/nature/*.*"):
                     newrealdata.append(file.replace("//", "/"))
+                    newgeneratortype.append(generator_dict["ImageNet"])
 
             self.aidata.extend(newaidata)
             self.realdata.extend(newrealdata)
+            self.generatortype.extend(newgeneratortype)
 
             # remove files that are not images
+            self.generatortype = [gen_type for i, gen_type in enumerate(self.generatortype) if self.aidata[i] not in exclude_files]
             self.aidata = [file for file in self.aidata if file not in exclude_files]
 
             print(f"Found {len(newaidata)} ai images and {len(newrealdata)} real images")
@@ -92,10 +114,10 @@ class GenImageDataset(Dataset):
     def __getitem__(self, idx):
         if idx < len(self.aidata):
             img = self.try_to_load_image(self.aidata[idx])
-            return self.transform(img), 0 # 0 for ai
+            return self.transform(img), 0, self.generatortype[idx]  # 0 for ai
         else:
             img = self.try_to_load_image(self.realdata[idx-len(self.aidata)])
-            return self.transform(img), 1
+            return self.transform(img), 1, generator_dict["ImageNet"]
         
     def __repr__(self):
         return f"GenImageDataset({len(self.aidata)} ai images, {len(self.realdata)} real images)"
