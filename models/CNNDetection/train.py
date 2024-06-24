@@ -16,8 +16,8 @@ if __name__ == '__main__':
 
     generators = available_generators(config.train.dataset.path)
     print(f"Available generators: {generators}")
-    leave_out = generators.pop(config.train.dataset.leave_out)
-    print(f"Leaving out generator: {leave_out}")
+    source_generators = [generators[i] for i in config.train.DANN_config.source]
+    target_generators = [generators[i] for i in config.train.DANN_config.target]
 
     data_loader = create_dataloader(
         data_path=config.train.dataset.path,
@@ -31,7 +31,7 @@ if __name__ == '__main__':
     dataset_size = len(data_loader)
     print(f'#training images = {dataset_size*config.train.batch_size}')
 
-    logger = Logger(config, unique=leave_out)
+    logger = Logger(config, unique=f"{config.train.DANN_config.source}_{config.train.DANN_config.target}")
 
     model = Trainer(config)
     # early_stopping = EarlyStopping(patience=config.earlystop_epoch, delta=-0.001, verbose=True)
@@ -50,11 +50,13 @@ if __name__ == '__main__':
 
             model.set_input(data)
             model_out = model.optimize_parameters()
-            output, loss = model_out['output'], model_out['loss']
 
             if model.total_steps % config.train.loss_freq == 0:
-                logger.add_scalar('loss', model.loss, model.total_steps)
-                logger.log_accuracy(output, model.label, model.total_steps, from_logits=True)
+                for key in model_out:
+                    if key == 'output':
+                        output = model_out[key]
+                    else:
+                        logger.add_scalar(key, model_out[key], model.total_steps)
                 logger.add_scalar('lr', model.optimizer.param_groups[0]['lr'], model.total_steps)
 
             if model.total_steps % config.train.save_img_freq == 0:
@@ -65,7 +67,6 @@ if __name__ == '__main__':
                       (config.name, epoch, model.total_steps))
                 model.save_networks('latest', logger.start_time)
 
-                
 
         if epoch % config.train.save_epoch_freq == 0:
             print('saving the model at the end of epoch %d, iters %d' %
@@ -81,14 +82,14 @@ if __name__ == '__main__':
         model.eval()
 
         # same generators
-        auc, r_acc, f_acc, overall_acc = evaluate_GenImage(model, config.train.dataset.path, generators=generators,val_size=config.train.val_size, batch_size=config.train.batch_size)
+        auc, r_acc, f_acc, overall_acc = evaluate_GenImage(model, config.train.dataset.path, generators=source_generators,val_size=config.train.val_size, batch_size=config.train.batch_size)
         logger.add_scalar('val_AUC', auc, epoch, writer='val')
         logger.add_scalar('val_real_acc', r_acc, epoch, writer='val')
         logger.add_scalar('val_fake_acc', f_acc, epoch, writer='val')
         logger.add_scalar('val_all_acc', overall_acc, epoch, writer='val')
 
         # different generator
-        auc, r_acc, f_acc, overall_acc = evaluate_GenImage(model, config.train.dataset.path, generators=[leave_out],val_size=config.train.val_size, batch_size=config.train.batch_size)
+        auc, r_acc, f_acc, overall_acc = evaluate_GenImage(model, config.train.dataset.path, generators=target_generators,val_size=config.train.val_size, batch_size=config.train.batch_size)
         logger.add_scalar('transfer_AUC', auc, epoch, writer='val')
         logger.add_scalar('transfer_real_acc', r_acc, epoch, writer='val')
         logger.add_scalar('transfer_fake_acc', f_acc, epoch, writer='val')

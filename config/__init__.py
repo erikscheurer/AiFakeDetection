@@ -11,7 +11,7 @@ def load_config(config_path):
 
     config = OmegaConf.load(config_path)
     if args.extra_opts:
-        extra_opts = OmegaConf.from_dotlist(args.extra_opts.split(','))
+        extra_opts = OmegaConf.from_dotlist(args.extra_opts.split(';'))
         config = OmegaConf.merge(config, extra_opts)
 
     return config

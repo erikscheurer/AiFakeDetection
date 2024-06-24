@@ -22,6 +22,7 @@ class BaseModel(nn.Module):
         # serialize model and optimizer to dict
         state_dict = {
             'model': self.model.state_dict(),
+            'adversarial': self.adversarial.state_dict() if hasattr(self, 'adversarial') else None,
             'optimizer' : self.optimizer.state_dict(),
             'total_steps' : self.total_steps,
         }
@@ -42,6 +43,8 @@ class BaseModel(nn.Module):
             del state_dict._metadata
 
         self.model.load_state_dict(state_dict['model'])
+        if hasattr(self, 'adversarial') and state_dict['adversarial']:
+            self.adversarial.load_state_dict(state_dict['adversarial'])
         self.total_steps = state_dict['total_steps']
 
         if self.isTrain and not hasattr(self.opt, 'new_optim'):

@@ -32,9 +32,32 @@ source ~/aacv_venv/bin/activate
 
 # test if pytorch can see the gpus
 echo "CUDA is available: "
-python -c "import torch; print(torch.cuda.is_available())"
+# python -c "import torch; print(torch.cuda.is_available())"
 echo $PYTHONPATH
 
 # run the script
-echo "Running the script with leave out: $1"
-python3 models/CNNDetection/train.py --extra_opts train.dataset.leave_out=$1
+source_list=()
+target_list=()
+echo "Running the script with target: $1"
+for i in {0..7}
+do
+    # if i is not $1, add to source list, else add to target
+    if [ $i -ne $1 ];
+    then
+        echo "Adding to source list: $i"
+        source_list=(${source_list[@]} $i)
+    else
+        echo "Adding to target list: $i"
+        target_list=(${target_list[@]} $i)
+    fi
+
+done
+# convert to python list
+source_list=$(printf "%s," "${source_list[@]}")
+source_list="[${source_list::-1}]"
+target_list=$(printf "%s," "${target_list[@]}")
+target_list="[${target_list::-1}]"
+
+echo "Source list: $source_list, Target list: $target_list"
+echo "train.DANN_config.source=$source_list;train.DANN_config.target=$target_list"
+python3 models/CNNDetection/train.py --extra_opts "train.DANN_config.source=$source_list;train.DANN_config.target=$target_list"

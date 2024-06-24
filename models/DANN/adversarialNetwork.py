@@ -2,31 +2,30 @@ import torch.nn as nn
 import torch
 import numpy as np
 
-class GradientReversalLayer(torch.autograd.Function):
-  def __init__(self, high_value=1.0):
-    self.iter_num = 0
-    self.alpha = 10
-    self.low = 0.0
-    self.high = high_value
-    self.max_iter = 10000.0
+class GradientReverse(torch.autograd.Function):
+    @staticmethod
+    def forward(ctx, x, coeff):
+        ctx.coeff = coeff
+        return x.view_as(x)
     
-  def forward(self, input):
-    self.iter_num += 1
-    output = input * 1.0
-    return output
+    @staticmethod
+    def backward(ctx, grad_output):
+        return -ctx.coeff * grad_output, None
+    
 
-  def backward(self, gradOutput):
-    self.coeff = np.float(2.0 * (self.high - self.low) / (1.0 + np.exp(-self.alpha*self.iter_num / self.max_iter)) - (self.high - self.low) + self.low)
-    return -self.coeff * gradOutput
+class GradientReversalLayer(nn.Module):
+    def __init__(self, alpha=1.0):
+        super(GradientReversalLayer, self).__init__()
+        self.iter_num = 0
+        self.alpha = alpha
+        self.low = 0.0
+        self.high = 1.0
+        self.max_iter = 10000.0
 
-class SilenceLayer(torch.autograd.Function):
-  def __init__(self):
-    pass
-  def forward(self, input):
-    return input * 1.0
+    def forward(self, x):
+        coeff = 2.0 * (self.high - self.low) / (1.0 + np.exp(-self.alpha * self.iter_num / self.max_iter)) - (self.high - self.low) + self.low
+        return GradientReverse.apply(x, coeff)
 
-  def backward(self, gradOutput):
-    return 0 * gradOutput
 
 class AdversarialNetwork(nn.Module):
   def __init__(self, in_feature):
@@ -58,3 +57,21 @@ class AdversarialNetwork(nn.Module):
     x = self.ad_layer3(x)
     x = self.sigmoid(x)
     return x
+
+
+# test gradient reversal
+if __name__ == '__main__':
+    x = torch.tensor([1.0, 2.0, 3.0], requires_grad=True)
+    gradient_reversal = GradientReversalLayer()
+    gradient_reversal.iter_num = 100000
+    y = gradient_reversal(x)*2
+    z = y.sum()
+    y.retain_grad()
+    z.retain_grad()
+    z.backward()
+    print(x.grad)
+    print(y.grad)
+    print(z.grad)
+    print(y)
+    print(z)
+    print(x)
