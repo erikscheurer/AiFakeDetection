@@ -12,13 +12,14 @@ class Trainer(BaseModel):
     def __init__(self, opt):
         super(Trainer, self).__init__(opt)
 
+        DANN = opt.train.DANN if hasattr(opt.train, 'DANN') else False
         if self.isTrain and not opt.train.continue_train:
-            self.model = resnet50(pretrained=True)
+            self.model = resnet50(pretrained=True, DANN_output=DANN)
             self.model.fc = nn.Linear(2048, 1)
             torch.nn.init.normal_(self.model.fc.weight.data, 0.0, 0.02)
 
         if not self.isTrain or opt.train.continue_train:
-            self.model = resnet50(num_classes=1)
+            self.model = resnet50(num_classes=1, DANN_output=DANN)
 
         if self.isTrain:
             self.loss_fn = nn.BCEWithLogitsLoss()
