@@ -1,7 +1,7 @@
 output_dir: ./output/F3Net
 name: F3Net
 train:
-  n_img_to_log: 10
+  n_img_to_log: 5
   save_img_freq: 100
 dataset_path: ./data/GenImage/
 pretrained_path: ./models/F3Net/pretrained/xception-b5690688.pth

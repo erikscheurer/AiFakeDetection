@@ -8,7 +8,6 @@ train:
   dataset:
     name: GenImage
     path: data/GenImage
-    leave_out: 0
   earlystop_epoch: 5
   data_aug: False
   optim: adam

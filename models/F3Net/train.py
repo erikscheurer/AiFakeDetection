@@ -17,8 +17,10 @@ from tqdm import tqdm
 
 if __name__ == '__main__':
     opt = load_config('models/F3Net/train.yaml')
+    from omegaconf import OmegaConf
+    print(OmegaConf.to_yaml(opt))
     generators = available_generators(opt.dataset_path)
-    leave_out = generators.pop(opt.train.dataset.leave_out)
+    leave_out = generators.pop(opt.leave_out)
 
     dataloader = create_dataloader(opt.dataset_path, 'GenImage', 'train', opt.batch_size, num_workers=4, target_size=(299,299), generators_allowed=generators)
 

@@ -10,7 +10,8 @@ class Logger:
         self.start_time = time.strftime("%Y-%m-%d_%H-%M-%S")
         name = os.path.join(opt.output_dir, "train", opt.name+self.start_time+unique)
         self.train_writer = SummaryWriter(name)
-        self.val_writer = SummaryWriter(name.replace("train", "val"))
+        #! temporarily use train_writer for val_writer
+        self.val_writer = self.train_writer # SummaryWriter(name.replace("train", "val"))
         self.n_img_to_log = opt.train.n_img_to_log
         self.save_img_freq = opt.train.save_img_freq
 

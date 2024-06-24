@@ -1,5 +1,5 @@
 
-for i in {1..8}
+for i in {0..7}
 do
     sbatch models/F3Net/train.sbatch $i
 done

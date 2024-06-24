@@ -31,8 +31,8 @@ def evaluate_GenImage(model, data_path, generators = None, split = 'val', batch_
     fpr, tpr, thresholds = roc_curve(y_true,y_pred,pos_label=1)
     AUC = cal_auc(fpr, tpr)
 
-    idx_real = np.where(y_true==0)[0]
-    idx_fake = np.where(y_true==1)[0]
+    idx_real = np.where(y_true==1)[0] # 1 for real
+    idx_fake = np.where(y_true==0)[0] # 0 for fake
 
     assert len(idx_real) > 0, f"No real images found: {y_true}"
     assert len(idx_fake) > 0, f"No fake images found: {y_true}"

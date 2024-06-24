@@ -1,13 +1,13 @@
 #!/bin/bash 
-#SBATCH --job-name=automotive_CV
+#SBATCH --job-name=ResNet50
 
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
 
 # d-hh:mm:ss
-#SBATCH --time=0-00:10:00
+#SBATCH --time=2-00:00:00
 
-#SBATCH --partition=dev_gpu_4 # single, gpu_4, gpu_8
+#SBATCH --partition=gpu_4 # single, gpu_4, gpu_8
 
 ##SBATCH --mem=4000
 
@@ -37,4 +37,4 @@ echo $PYTHONPATH
 
 # run the script
 echo "Running the script with leave out: $1"
-python3 models/CNNDetection/train.py --extra_opts config.train.dataset.leave_out=$1
+python3 models/CNNDetection/train.py --extra_opts train.dataset.leave_out=$1
