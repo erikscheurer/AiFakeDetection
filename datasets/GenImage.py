@@ -9,7 +9,7 @@ import glob
 generator_dict = {
     "ImageNet": -1,
     "ADM": 0,
-    "BigGan": 1,
+    "BigGAN": 1,
     "glide": 2,
     "Midjourney": 3,
     "stable_diffusion_v_1_4": 4,
@@ -33,19 +33,6 @@ class GenImageDataset(Dataset):
         self.aidata = []
         self.realdata = []
         self.generatortype = []
-
-        exclude_files = [
-            './data/GenImage/stable_diffusion_v_1_4/stable_diffusion_v_1_4_extracted/train/ai/033_sdv4_00137.png',
-            './data/GenImage/stable_diffusion_v_1_4/stable_diffusion_v_1_4_extracted/train/ai/033_sdv4_00134.png',
-            './data/GenImage/stable_diffusion_v_1_4/stable_diffusion_v_1_4_extracted/train/ai/033_sdv4_00152.png',
-            './data/GenImage/Midjourney/Midjourney_extracted/train/ai/208_midjourney_76.png',
-            './data/GenImage/Midjourney/Midjourney_extracted/train/ai/208_midjourney_92.png',
-            './data/GenImage/Midjourney/Midjourney_extracted/train/ai/208_midjourney_91.png',
-            './data/GenImage/BigGAN/BigGAN_extracted/train/ai/116_biggan_00107.png',
-            './data/GenImage/BigGAN/BigGAN_extracted/train/ai/116_biggan_00094.png',
-            './data/GenImage/BigGAN/BigGAN_extracted/train/ai/116_biggan_00081.png',
-            './data/GenImage/BigGAN/BigGAN_extracted/train/ai/116_biggan_00098.png',
-        ]
 
         for generator in generators:
             if not os.path.isdir(f"{data_path}/{generator}"):
@@ -76,10 +63,6 @@ class GenImageDataset(Dataset):
             self.aidata.extend(newaidata)
             self.realdata.extend(newrealdata)
             self.generatortype.extend(newgeneratortype)
-
-            # remove files that are not images
-            self.generatortype = [gen_type for i, gen_type in enumerate(self.generatortype) if self.aidata[i] not in exclude_files]
-            self.aidata = [file for file in self.aidata if file not in exclude_files]
 
             print(f"Found {len(newaidata)} ai images and {len(newrealdata)} real images")
 
@@ -125,7 +108,7 @@ class GenImageDataset(Dataset):
 
 
 if __name__ == "__main__":
-    dataset = GenImageDataset("data/GenImage",split='val')#, generators_allowed=['glide'])',
+    dataset = GenImageDataset("data",split='val')#, generators_allowed=['glide'])',
     print(dataset)
     print(dataset[0][0].shape)
     import matplotlib.pyplot as plt
