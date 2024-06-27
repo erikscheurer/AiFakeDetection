@@ -3,11 +3,11 @@ import torch
 from .dummy import DummyDataset
 from .GenImage import GenImageDataset
 
-def create_dataloader(data_path, dataset='GenImage', split='train', batch_size=32, num_workers=4,shuffle=None, **kwargs):
+def create_dataloader(data_path, dataset='GenImage', split='train', batch_size=32, num_workers=4,shuffle=None, transform = GenImageDataset.TransformFlag.NONE, **kwargs):
     if dataset.lower() == 'dummy' or dataset.lower() == 'random':
         dataset = DummyDataset(data_path, split=split,**kwargs)
     elif dataset.lower() == 'genimage':
-        dataset = GenImageDataset(data_path, split=split, **kwargs)
+        dataset = GenImageDataset(data_path, split=split, transform=transform, **kwargs)
     else:
         raise ValueError(f"dataset {dataset} not found")
     

@@ -3,7 +3,7 @@ import time
 import torch.nn
 from tqdm import tqdm
 
-from datasets import create_dataloader, available_generators
+from datasets import create_dataloader, available_generators, GenImageDataset
 # from earlystop import EarlyStopping
 from models.CNNDetection.networks.trainer import Trainer
 from models.F3Net.utils import evaluate_GenImage
@@ -25,7 +25,8 @@ if __name__ == '__main__':
         split='train',
         batch_size=config.train.batch_size,
         num_workers=config.train.num_workers,
-        generators_allowed=generators
+        generators_allowed=generators,
+        transform=GenImageDataset.TransformFlag.ALL
     )
 
     dataset_size = len(data_loader)

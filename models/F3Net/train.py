@@ -10,7 +10,7 @@ from utils import evaluate_GenImage, setup_logger
 from trainer import Trainer
 from logger import Logger
 
-from datasets import create_dataloader, available_generators
+from datasets import create_dataloader, available_generators, GenImageDataset
 from config import load_config
 from tqdm import tqdm
 
@@ -22,7 +22,7 @@ if __name__ == '__main__':
     generators = available_generators(opt.dataset_path)
     leave_out = generators.pop(opt.leave_out)
 
-    dataloader = create_dataloader(opt.dataset_path, 'GenImage', 'train', opt.batch_size, num_workers=4, target_size=(299,299), generators_allowed=generators)
+    dataloader = create_dataloader(opt.dataset_path, 'GenImage', 'train', opt.batch_size, num_workers=4, target_size=(299,299), generators_allowed=generators, transform= GenImageDataset.TransformFlag.ALL)
 
     # init checkpoint and logger
     logger = setup_logger(opt.output_dir, 'result.log', 'logger')

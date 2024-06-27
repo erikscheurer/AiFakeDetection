@@ -1,11 +1,21 @@
 import torch
 from torch.utils.data import Dataset
-from torchvision.transforms.v2 import Compose, RandomResizedCrop, ToImage, ToDtype, Resize
+from torchvision.transforms.v2 import Compose, RandomResizedCrop, ToImage, ToDtype, Resize, RandomHorizontalFlip, GaussianBlur, JPEG, RandomGrayscale
 from PIL import Image
 import os
 import glob
+from enum import Flag
+
 
 class GenImageDataset(Dataset):
+    class TransformFlag(Flag):
+        NONE = 0
+        RANDOM_HORIZONTAL_FLIP = 1
+        GAUSSIAN_BLUR = 2
+        RANDOM_JPEG = 4
+        RANDOM_GRAYSCALE = 8
+        ALL = 15
+
     def __init__(self, data_path, split="train", transform=None, target_size=(128,128), generators_allowed: list = None):
         """
         data_path: path to the data folder
@@ -68,16 +78,24 @@ class GenImageDataset(Dataset):
         if len(self.aidata) != len(self.realdata):
             print(f"WARNING: Number of ai images ({len(self.aidata)}) and real images ({len(self.realdata)}) do not match")
             
-        if transform is not None:
-            raise NotImplementedError("Custom transforms are not supported yet")
-
+        
         self.target_size = target_size
-        self.transform = Compose([
-            # RandomResizedCrop(target_size),
+        transform_list = [
             Resize(self.target_size),
-            ToImage(),
-            ToDtype(torch.float32, scale=True)
-        ])
+            ToImage()
+            ]
+        if transform is not None:
+            if transform & self.TransformFlag.RANDOM_HORIZONTAL_FLIP:
+                transform_list.append(RandomHorizontalFlip())
+            if transform & self.TransformFlag.GAUSSIAN_BLUR:
+                transform_list.append(GaussianBlur(kernel_size=(1, 5), sigma=(0.1, 2.0)))
+            if transform & self.TransformFlag.RANDOM_JPEG:
+                transform_list.append(JPEG(quality=(20, 100)))
+            if transform & self.TransformFlag.RANDOM_GRAYSCALE:
+                transform_list.append(RandomGrayscale(p=0.1))
+        transform_list.append(ToDtype(torch.float32, scale=True))
+
+        self.transform = Compose(transform_list)
 
     def __len__(self):
         return len(self.aidata)+len(self.realdata)
