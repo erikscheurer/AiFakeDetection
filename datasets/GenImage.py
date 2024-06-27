@@ -7,15 +7,15 @@ import glob
 
 
 generator_dict = {
-    "ImageNet": -1,
-    "ADM": 0,
-    "BigGAN": 1,
-    "glide": 2,
-    "Midjourney": 3,
-    "stable_diffusion_v_1_4": 4,
-    "stable_diffusion_v_1_5": 5,
-    "VQDM": 6,
-    "wukong": 7
+    'ImageNet': -1,
+    'stable_diffusion_v_1_4': 0,
+    'glide': 1,
+    'stable_diffusion_v_1_5': 2,
+    'Midjourney': 3,
+    'wukong': 4,
+    'ADM': 5,
+    'VQDM': 6,
+    'BigGAN': 7
 }
 
 
@@ -50,7 +50,6 @@ class GenImageDataset(Dataset):
                 newgeneratortype.append(generator_dict[generator])
             for file in glob.iglob(f"{data_path}/{generator}/{split}/nature/*.*"):
                 newrealdata.append(file.replace("//", "/"))
-                newgeneratortype.append(generator_dict["ImageNet"])
 
             if len(newaidata) == 0: # temporary fix for extracted data structure
                 for file in glob.iglob(f"{data_path}/{generator}/{generator}_extracted/{split}/ai/*.*"):
@@ -58,7 +57,6 @@ class GenImageDataset(Dataset):
                     newgeneratortype.append(generator_dict[generator])
                 for file in glob.iglob(f"{data_path}/{generator}/{generator}_extracted/{split}/nature/*.*"):
                     newrealdata.append(file.replace("//", "/"))
-                    newgeneratortype.append(generator_dict["ImageNet"])
 
             self.aidata.extend(newaidata)
             self.realdata.extend(newrealdata)

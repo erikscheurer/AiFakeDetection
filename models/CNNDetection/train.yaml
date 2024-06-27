@@ -1,8 +1,8 @@
 name: ResNet_DANN
 isTrain: True
-gpu_ids:  #[0]
+gpu_ids:  [0]
 checkpoints_dir: output/ResNet_Dann/checkpoints
-output_dir: output/ResNet_DANN/
+output_dir: output/ResNet_DANN_debug/
 
 train:
   dataset:
@@ -32,3 +32,7 @@ train:
   batch_size: 32
   num_workers: 10
   DANN: True
+  DANN_config:
+    tradeoff: 1.
+    # source: [1,2,3]
+    # target: [4]

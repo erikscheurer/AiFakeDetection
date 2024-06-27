@@ -18,6 +18,8 @@ if __name__ == '__main__':
     print(f"Available generators: {generators}")
     source_generators = [generators[i] for i in config.train.DANN_config.source]
     target_generators = [generators[i] for i in config.train.DANN_config.target]
+    print(f"Source generators: {source_generators}")
+    print(f"Target generators: {target_generators}")
 
     data_loader = create_dataloader(
         data_path=config.train.dataset.path,
@@ -25,7 +27,7 @@ if __name__ == '__main__':
         split='train',
         batch_size=config.train.batch_size,
         num_workers=config.train.num_workers,
-        generators_allowed=generators
+        generators_allowed=source_generators+target_generators
     )
 
     dataset_size = len(data_loader)
@@ -43,7 +45,8 @@ if __name__ == '__main__':
         #                      Training                          #
         ##########################################################
 
-        for i, data in tqdm(enumerate(data_loader), total=len(data_loader)):
+        # tqdm only every 10 steps
+        for i, data in tqdm(enumerate(data_loader), total=len(data_loader),miniters=50):
             model.total_steps += 1
             if i >= config.train.epoch_size:
                 break
@@ -55,6 +58,7 @@ if __name__ == '__main__':
                 for key in model_out:
                     if key == 'output':
                         output = model_out[key]
+                        logger.log_accuracy(output, model.label, model.total_steps, from_logits=True)
                     else:
                         logger.add_scalar(key, model_out[key], model.total_steps)
                 logger.add_scalar('lr', model.optimizer.param_groups[0]['lr'], model.total_steps)

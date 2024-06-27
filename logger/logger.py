@@ -19,6 +19,7 @@ class Logger:
         if writer == 'train':
             self.train_writer.add_scalar(tag, scalar_value, global_step, walltime)
         elif writer == 'val':
+            print("Logging to val writer:", tag, scalar_value, global_step)
             self.val_writer.add_scalar(tag, scalar_value, global_step, walltime)
         else:
             raise ValueError("writer should be 'train' or 'val'")
@@ -35,7 +36,11 @@ class Logger:
     
     def log_accuracy(self, output, labels, global_step=None, walltime=None, writer='train', from_logits=False):
         accuracy = self.calc_accuracy(output, labels, from_logits)
+        fake_accuracy = self.calc_accuracy(output[labels==0], labels[labels==0], from_logits)
+        real_accuracy = self.calc_accuracy(output[labels==1], labels[labels==1], from_logits)
         self.add_scalar('accuracy', accuracy, global_step, walltime, writer)
+        self.add_scalar('accuracy_fake', fake_accuracy, global_step, walltime, writer)
+        self.add_scalar('accuracy_real', real_accuracy, global_step, walltime, writer)
 
     def close(self):
         self.train_writer.close()

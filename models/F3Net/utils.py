@@ -18,12 +18,12 @@ def evaluate_GenImage(model, data_path, generators = None, split = 'val', batch_
         y_true, y_pred = [], []
 
         dataloader = create_dataloader(data_path, 'GenImage', split, batch_size, num_workers=4, shuffle=True, target_size=(299,299), generators_allowed=generators)
-        for i,(img, label) in enumerate(tqdm(dataloader)):
+        for i,(img, label, generator_label) in enumerate(tqdm(dataloader)):
 
             if i>=val_size:
                 break
             img = img.detach().to(model.device)
-            output = model.forward(img)
+            features, output = model.forward(img)
             y_pred.extend(output.sigmoid().flatten().tolist())
             y_true.extend(label.flatten().tolist())
 

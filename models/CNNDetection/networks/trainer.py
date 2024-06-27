@@ -24,8 +24,9 @@ class Trainer(BaseModel):
 
         if self.isDANN:
             self.adversarial = AdversarialNetwork(in_feature=2048) # 2048 is the output of the resnet50 before the fc layer
-            self.source_gens = opt.train.DANN_config.source
+            self.source_gens = opt.train.DANN_config.source + [-1]
             self.target_gens = opt.train.DANN_config.target
+            self.DANN_tradeoff = opt.train.DANN_config.tradeoff
 
         if self.isTrain:
             self.loss_fn = nn.BCEWithLogitsLoss()
@@ -97,8 +98,7 @@ class Trainer(BaseModel):
 
         if self.isDANN:
             self.DANN_loss = self.loss_fn(self.DANN_output.squeeze(1), self.generator_label)
-            self.loss += self.DANN_loss
-
+            self.loss += self.DANN_loss * self.DANN_tradeoff
         self.optimizer.zero_grad()
         self.loss.backward()
         self.optimizer.step()
