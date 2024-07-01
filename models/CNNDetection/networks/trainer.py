@@ -30,6 +30,7 @@ class Trainer(BaseModel):
 
         if self.isTrain:
             self.loss_fn = nn.BCEWithLogitsLoss()
+            self.DANN_lossfn = nn.CrossEntropyLoss()
             # initialize optimizers
             if opt.train.optim == 'adam':
                 self.optimizer = torch.optim.Adam(self.model.parameters(),
@@ -97,7 +98,7 @@ class Trainer(BaseModel):
         self.loss = self.classify_loss
 
         if self.isDANN:
-            self.DANN_loss = self.loss_fn(self.DANN_output.squeeze(1), self.generator_label)
+            self.DANN_loss = self.DANN_lossfn(self.DANN_output.squeeze(1)[self.generator_label!=-1], self.generator_label[self.generator_label!=-1])
             self.loss += self.DANN_loss * self.DANN_tradeoff
         self.optimizer.zero_grad()
         self.loss.backward()

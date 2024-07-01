@@ -67,16 +67,14 @@ if __name__ == '__main__':
                 logger.log_images('train', model.input, model.label, model.output, model.total_steps)
 
             if model.total_steps % config.train.save_latest_freq == 0:
-                print('saving the latest model %s (epoch %d, model.total_steps %d)' %
-                      (config.name, epoch, model.total_steps))
-                model.save_networks('latest', logger.start_time)
+                print(f'saving the latest model (epoch {epoch}, total_steps {model.total_steps}), {logger.start_time} {target_generators}')
+                model.save_networks('latest', logger.start_time+str(target_generators))
 
 
         if epoch % config.train.save_epoch_freq == 0:
-            print('saving the model at the end of epoch %d, iters %d' %
-                  (epoch, model.total_steps))
-            model.save_networks('latest',logger.start_time)
-            model.save_networks(epoch,logger.start_time)
+            print(f'saving the model at the end of epoch {epoch}, iters {model.total_steps}, {logger.start_time} {target_generators}')
+            model.save_networks('latest', logger.start_time+str(target_generators))
+            model.save_networks(epoch, logger.start_time+str(target_generators))
 
 
         ##########################################################

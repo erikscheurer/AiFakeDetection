@@ -15,7 +15,7 @@ train:
   loss_freq: 1
   save_latest_freq: 2000
   save_epoch_freq: 20
-  save_img_freq: 10
+  save_img_freq: 1000
   n_img_to_log: 5
   continue_train: False
   epoch_count: 10

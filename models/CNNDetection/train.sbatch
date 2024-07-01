@@ -1,11 +1,11 @@
 #!/bin/bash 
-#SBATCH --job-name=ResNet50
+#SBATCH --job-name=ResNet50_DANN
 
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
 
 # d-hh:mm:ss
-#SBATCH --time=2-00:00:00
+#SBATCH --time=15:00:00
 
 #SBATCH --partition=gpu_4 # single, gpu_4, gpu_8
 
@@ -28,7 +28,7 @@ module load devel/python/3.11.7_intel_2021.4.0
 export PYTHONPATH=~/AiFakeDetection:$PYTHONPATH
 cd ~/AiFakeDetection
 source ~/aacv_venv/bin/activate
-
+unset DISPLAY
 
 # test if pytorch can see the gpus
 echo "CUDA is available: "

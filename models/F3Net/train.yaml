@@ -11,6 +11,6 @@ max_epoch: 5
 generators: null
 model_save_path: ./output/F3Net/checkpoints/
 loss_freq: 40
-model_save_freq: 100
+model_save_freq: 1000
 epoch_size: 10000
 val_size: 1000

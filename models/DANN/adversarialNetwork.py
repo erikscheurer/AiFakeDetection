@@ -55,7 +55,6 @@ class AdversarialNetwork(nn.Module):
     x = self.relu2(x)
     x = self.dropout2(x)
     x = self.ad_layer3(x)
-    x = self.sigmoid(x)
     return x
 
 
