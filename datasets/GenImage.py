@@ -90,7 +90,7 @@ class GenImageDataset(Dataset):
             if transform & self.TransformFlag.GAUSSIAN_BLUR:
                 transform_list.append(GaussianBlur(kernel_size=(1, 5), sigma=(0.1, 2.0)))
             if transform & self.TransformFlag.RANDOM_JPEG:
-                transform_list.append(JPEG(quality=(20, 100)))
+                transform_list.append(JPEG(quality=(50, 100)))
             if transform & self.TransformFlag.RANDOM_GRAYSCALE:
                 transform_list.append(RandomGrayscale(p=0.1))
         transform_list.append(ToDtype(torch.float32, scale=True))

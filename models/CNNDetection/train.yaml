@@ -1,13 +1,14 @@
-name: CNNDetection
+name: CNNDetection_augment
 isTrain: True
-gpu_ids:  #[0]
-checkpoints_dir: output/CNNDetection/checkpoints
-output_dir: output/CNNDetection/
+gpu_ids:  [0]
+checkpoints_dir: output/CNNDetection_augment/checkpoints
+output_dir: output/CNNDetection_augment/
 
 train:
   dataset:
     name: GenImage
     path: data/GenImage
+    leave_out: 0
   earlystop_epoch: 5
   data_aug: False
   optim: adam
@@ -15,7 +16,7 @@ train:
   loss_freq: 1
   save_latest_freq: 2000
   save_epoch_freq: 20
-  save_img_freq: 10
+  save_img_freq: 1000
   n_img_to_log: 5
   continue_train: False
   epoch_count: 10

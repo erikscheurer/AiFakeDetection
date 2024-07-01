@@ -9,6 +9,7 @@ class Logger:
         self.output_dir = opt.output_dir
         self.start_time = time.strftime("%Y-%m-%d_%H-%M-%S")
         name = os.path.join(opt.output_dir, "train", opt.name+self.start_time+unique)
+        print(f"Logging to {name}")
         self.train_writer = SummaryWriter(name)
         #! temporarily use train_writer for val_writer
         self.val_writer = self.train_writer # SummaryWriter(name.replace("train", "val"))

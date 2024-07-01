@@ -1,5 +1,6 @@
 
-for i in {1..8}
-do
+for i in {0..7}
+do  
+    echo "Running fold $i"
     sbatch models/CNNDetection/train.sbatch $i
 done

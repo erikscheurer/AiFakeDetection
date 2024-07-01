@@ -12,8 +12,10 @@ from logger import Logger
 
 
 if __name__ == '__main__':
+    print(time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()))
+    
     config = load_config('models/CNNDetection/train.yaml')
-
+    
     generators = available_generators(config.train.dataset.path)
     print(f"Available generators: {generators}")
     leave_out = generators.pop(config.train.dataset.leave_out)
