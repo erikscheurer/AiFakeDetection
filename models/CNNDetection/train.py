@@ -13,6 +13,12 @@ from logger import Logger
 
 if __name__ == '__main__':
     config = load_config('models/CNNDetection/train.yaml')
+    seed = config.seed
+    torch.manual_seed(seed)
+    torch.cuda.manual_seed(seed)
+    torch.cuda.manual_seed_all(seed)
+    torch.backends.cudnn.deterministic = True
+    torch.backends.cudnn.benchmark = False
 
     generators = available_generators(config.train.dataset.path)
     print(f"Available generators: {generators}")

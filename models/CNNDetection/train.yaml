@@ -1,8 +1,9 @@
-name: ResNet_DANN
+name: ResNet
 isTrain: True
 gpu_ids:  [0]
-checkpoints_dir: output/ResNet_Dann/checkpoints
-output_dir: output/ResNet_DANN_debug/
+checkpoints_dir: output/ResNet/checkpoints
+output_dir: output/ResNet/
+seed: 0
 
 train:
   dataset:

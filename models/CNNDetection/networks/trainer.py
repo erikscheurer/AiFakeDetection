@@ -80,7 +80,7 @@ class Trainer(BaseModel):
             return features, self.output
         else:
             self.output = self.model(self.input)
-            return self.output
+            return 0,self.output
 
     def get_loss(self):
         return self.loss_fn(self.output.squeeze(1), self.label)
@@ -93,7 +93,7 @@ class Trainer(BaseModel):
             source_outputs = self.output[indices]
         else:
             source_outputs = self.output
-            indices = []*len(self.generator_label)
+            indices = range(len(self.label))
         self.classify_loss = self.loss_fn(source_outputs.squeeze(1), self.label[indices])
         self.loss = self.classify_loss
 
@@ -105,4 +105,4 @@ class Trainer(BaseModel):
         self.optimizer.step()
         self.lr_scheduler.step()
 
-        return {"output": self.output, "loss": self.loss, "DANN_loss": self.DANN_loss if self.isDANN else None, "classify_loss": self.classify_loss}
+        return {"output": self.output, "loss": self.loss, "DANN_loss": self.DANN_loss if self.isDANN else 0, "classify_loss": self.classify_loss}
