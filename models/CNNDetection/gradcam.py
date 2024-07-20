@@ -52,18 +52,19 @@ data_loader = create_dataloader(
     dataset=config.train.dataset.name,
     split='train',
     batch_size=config.train.batch_size,
-    num_workers=config.train.num_workers
+    num_workers=config.train.num_workers,
+    generators_allowed=['stable_diffusion_v_1_4'],real=False
 )
 
 model = Trainer(config)
-model.load_networks('latest')
+model.load_networks('', filename="output/ResNet/checkpoints/ResNet/2024-07-02_17-53-08['stable_diffusion_v_1_4']_model_epoch_latest.pth")
 
 # Construct the CAM object
 target_layers = [model.model.layer4[-1]]
 cam = GradCAM(model=model.model, target_layers=target_layers)
 
 inputs = next(iter(data_loader))
-inputs, labels = inputs[0], inputs[1]
+inputs, labels, gen_label = inputs[0], inputs[1], inputs[2]
 targets = [BinaryClassifierOutputTarget(t) for t in labels]
 
 grayscale_cam = cam(input_tensor=inputs, targets=targets)
@@ -73,11 +74,30 @@ for i in range(len(grayscale_cam)):
     visualization = show_cam_on_image(inputs[i].permute(1, 2, 0).numpy(), curr)
     visualizations.append(visualization)
 
-plt.figure(figsize=(23, 20))
+
+generator_dict = {
+    'ImageNet': -1,
+    'stable_diffusion_v_1_4': 0,
+    'glide': 1,
+    'stable_diffusion_v_1_5': 2,
+    'Midjourney': 3,
+    'wukong': 4,
+    'ADM': 5,
+    'VQDM': 6,
+    'BigGAN': 7,
+    'Camera': 8,
+    'MidjourneyV6': 9,
+    'StableDiffusion3': 10,
+    'StableDiffusion3OwnPrompts': 11,
+}
+inv_dict={v: k for k, v in generator_dict.items()}
+
+plt.figure(figsize=(23, 15))
 for i in range(10):
     plt.subplot(2, 5, i+1)
     plt.imshow(visualizations[i])
-    plt.title(f"Label: {'AI' if labels[i] == 0 else 'Nature'}")
+    plt.title(f"Label: {f'AI: {inv_dict[gen_label[i].item()]}' if labels[i] == 0 else 'Nature'}")
     plt.axis('off')
-plt.tight_layout()
+# plt.tight_layout()
 plt.show()
+# plt.savefig("gradcam.png", bbox_inches='tight')

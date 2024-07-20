@@ -15,12 +15,16 @@ generator_dict = {
     'wukong': 4,
     'ADM': 5,
     'VQDM': 6,
-    'BigGAN': 7
+    'BigGAN': 7,
+    'Camera': 8,
+    'MidjourneyV6': 9,
+    'StableDiffusion3': 10,
+    'StableDiffusion3OwnPrompts': 11,
 }
 
 
 class GenImageDataset(Dataset):
-    def __init__(self, data_path, split="train", transform=None, target_size=(128,128), generators_allowed: list = None):
+    def __init__(self, data_path, split="train", transform=None, target_size=(128,128), generators_allowed: list = None, real=True, fake=True):
         """
         data_path: path to the data folder
         split: train or val
@@ -65,9 +69,9 @@ class GenImageDataset(Dataset):
             print(f"Found {len(newaidata)} ai images and {len(newrealdata)} real images")
 
         if len(self.aidata) == 0:
-            raise ValueError(f"No ai images found for generator {generator}")
+            print(f"No ai images found for generator {generator}")
         if len(self.realdata) == 0:
-            raise ValueError(f"No real images found for generator {generator}")
+            print(f"No real images found for generator {generator}")
         if len(self.aidata) != len(self.realdata):
             print(f"WARNING: Number of ai images ({len(self.aidata)}) and real images ({len(self.realdata)}) do not match")
             
@@ -81,6 +85,14 @@ class GenImageDataset(Dataset):
             ToImage(),
             ToDtype(torch.float32, scale=True)
         ])
+
+        if not real:
+            self.realdata = []
+            print("WARNING: Disregarding real data")
+        if not fake:
+            self.aidata = []
+            self.generatortype = []
+            print("WARNING: Disregarding fake data")
 
     def __len__(self):
         return len(self.aidata)+len(self.realdata)

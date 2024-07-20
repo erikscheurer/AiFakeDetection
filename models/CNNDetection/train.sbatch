@@ -1,5 +1,5 @@
 #!/bin/bash 
-#SBATCH --job-name=ResNet50_DANN
+#SBATCH --job-name=ResNet50
 
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
@@ -16,8 +16,8 @@
 #SBATCH --gres=gpu:2
 
 # Info
-##SBATCH --mail-user=my@email.com
-##SBATCH --mail-type=END,FAIL
+#SBATCH --mail-user=mail@stud.uni-stuttgart.de
+#SBATCH --mail-type=END,FAIL
 
 # output name 
 #SBATCH --output="output/ResNet_%j.out"

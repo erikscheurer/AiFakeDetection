@@ -31,9 +31,9 @@ class BaseModel(nn.Module):
         torch.save(state_dict, save_path)
 
     # load models from the disk
-    def load_networks(self, epoch):
-        load_filename = 'model_epoch_%s.pth' % epoch
-        load_path = os.path.join(self.save_dir, load_filename)
+    def load_networks(self, epoch='latest', filename=''):
+        load_filename = filename or 'model_epoch_%s.pth' % epoch
+        load_path = load_filename#os.path.join(self.save_dir, load_filename)
 
         print('loading the model from %s' % load_path)
         # if you are using PyTorch newer than 0.4 (e.g., built from

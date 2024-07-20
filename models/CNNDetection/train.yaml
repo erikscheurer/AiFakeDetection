@@ -1,8 +1,19 @@
-name: ResNet
+name: CNNDetection_augment
 isTrain: True
-gpu_ids:  [0]
-checkpoints_dir: output/ResNet/checkpoints
-output_dir: output/ResNet/
+gpu_ids: [0]
+checkpoints_dir: /home/st/st_us-053030/st_st161532/AiFakeDetection2/output/CNNDetection_augment/checkpoints/
+checkpoint_names:
+  stable_diffusion_v_1_4_resnet: 2024-07-01_23-10-03_model_epoch_40.pth
+  stable_diffusion_v_1_4_dann: 2024-07-01_21-38-17['stable_diffusion_v_1_4']_model_epoch_40.pth
+  Midjourney_resnet: 2024-07-03_03-27-39['Midjourney']_model_epoch_40.pth
+  stable_diffusion_v_1_5: 2024-07-01_22-09-05['stable_diffusion_v_1_5']_model_epoch_40.pth
+  ADM: 2024-07-01_21-25-21['ADM']_model_epoch_40.pth
+  glide: 2024-07-01_22-08-55['glide']_model_epoch_40.pth
+  wukong: 2024-07-01_22-49-24['wukong']_model_epoch_40.pth
+  Midjourney: 2024-07-01_22-22-46['Midjourney']_model_epoch_40.pth
+  VQDM: 2024-07-01_21-25-21['VQDM']_model_epoch_40.pth
+  BigGAN: 2024-07-01_21-25-21['BigGAN']_model_epoch_40.pth
+output_dir: output/ResNet_Current/
 seed: 0
 
 train:
@@ -32,8 +43,8 @@ train:
   lr_decay_epoch: 10000
   batch_size: 32
   num_workers: 10
-  DANN: True
+  DANN: False
   DANN_config:
     tradeoff: 1.
-    # source: [1,2,3]
-    # target: [4]
+    source: [1,2,3]
+    target: [4]

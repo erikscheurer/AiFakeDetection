@@ -26,11 +26,11 @@ class Logger:
         
     def calc_accuracy(self, output, labels, from_logits=False):
         if from_logits:
-            predictions = torch.round(torch.sigmoid(output.squeeze()))
+            predictions = torch.round(torch.sigmoid(output))
         else:
             assert all(output >= 0) and all(output <= 1), "output should be in [0,1], if not from logits. Did you forget to apply sigmoid or not specify from_logits=True?"
-            predictions = torch.round(output.squeeze())
-        assert predictions.shape == labels.shape
+            predictions = torch.round(output)
+        assert predictions.shape == labels.shape, f"Predictions shape {predictions.shape} does not match labels shape {labels.shape}, {predictions}, {labels}"
         correct = predictions == labels
         return correct.float().mean()
     
