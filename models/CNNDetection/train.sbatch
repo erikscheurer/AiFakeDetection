@@ -37,4 +37,4 @@ echo $PYTHONPATH
 
 # run the script
 echo "Running the script with leave out: $1"
-python3 models/CNNDetection/train.py --extra_opts train.dataset.leave_out=$1
+python3 models/CNNDetection/train.py --extra_opts train.dataset.leave_out=$1,fourier=True,name=ResNet_noPretrain_fourier,checkpoints_dir=output/ResNet_noPretrain_fourier/checkpoints,output_dir=output/ResNet_noPretrain_fourier/

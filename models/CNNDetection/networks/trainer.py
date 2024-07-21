@@ -13,7 +13,8 @@ class Trainer(BaseModel):
         super(Trainer, self).__init__(opt)
 
         if self.isTrain and not opt.train.continue_train:
-            self.model = resnet50(pretrained=True)
+            in_channels = 6 if opt.fourier else 3
+            self.model = resnet50(in_channels = in_channels)
             self.model.fc = nn.Linear(2048, 1)
             torch.nn.init.normal_(self.model.fc.weight.data, 0.0, 0.02)
 

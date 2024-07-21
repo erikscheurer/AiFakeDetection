@@ -1,13 +1,15 @@
-name: CNNDetection
+name: ResNet_noPretrain_fourier
 isTrain: True
-gpu_ids:  #[0]
-checkpoints_dir: output/CNNDetection/checkpoints
-output_dir: output/CNNDetection/
+gpu_ids: [0]
+checkpoints_dir: output/ResNet_noPretrain_fourier/checkpoints
+output_dir: output/ResNet_noPretrain_fourier/
 
+fourier: False
 train:
   dataset:
     name: GenImage
     path: data/GenImage
+    # leave_out: 1
   earlystop_epoch: 5
   data_aug: False
   optim: adam

@@ -47,7 +47,13 @@ if __name__ == '__main__':
             model.total_steps += 1
             if i >= config.train.epoch_size:
                 break
-
+            
+            if config.fourier:
+                # perform fourier transform on the input
+                data[0] = torch.fft.rfft2(data[0]).log()
+                # separate the real and imaginary parts
+                data[0] = torch.cat([data[0].real, data[0].imag], dim=1)
+            
             model.set_input(data)
             model_out = model.optimize_parameters()
             output, loss = model_out['output'], model_out['loss']
