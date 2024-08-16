@@ -32,7 +32,7 @@ class AdversarialNetwork(nn.Module):
     super(AdversarialNetwork, self).__init__()
     self.ad_layer1 = nn.Linear(in_feature, 1024)
     self.ad_layer2 = nn.Linear(1024,1024)
-    self.ad_layer3 = nn.Linear(1024, 1)
+    self.ad_layer3 = nn.Linear(1024, 8)
     self.ad_layer1.weight.data.normal_(0, 0.01)
     self.ad_layer2.weight.data.normal_(0, 0.01)
     self.ad_layer3.weight.data.normal_(0, 0.3)

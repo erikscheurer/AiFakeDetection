@@ -30,7 +30,8 @@ if __name__ == '__main__':
             batch_size=config.train.batch_size,
             num_workers=config.train.num_workers,
             generators_allowed=[generator],
-            real=True,fake=True
+            real=True,fake=True,
+            shuffle=False
         )
 
         dataset_size = len(data_loader)
@@ -39,9 +40,11 @@ if __name__ == '__main__':
         # logger = Logger(config, unique=f"{config.train.DANN_config.source}_{config.train.DANN_config.target}")
 
         model = Trainer(config)
-        print(f"Loading model {config.checkpoint_names[generator]} for generator {generator}")
-        model.load_networks(filename=config.checkpoint_names['stable_diffusion_v_1_4_resnet'])
+        # print(f"Loading model {config.checkpoint_names[generator]} for generator {generator}")
+        model.load_networks(filename="output/ResNet_noPretraining/checkpoints/ResNet_noPretraining/2024-07-22_16-10-02['stable_diffusion_v_1_4']_model_epoch_40.pth")
+        # model.load_networks(filename="output/ResNet_noPretrain_fourier/checkpoints/ResNet_noPretrain_fourier/2024-07-20_14-19-17_model_epoch_latest.pth")#config.checkpoint_names['stable_diffusion_v_1_4_dann'])
         model.eval()
+
 
         # tqdm only every 10 steps
         for i, data in tqdm(enumerate(data_loader), total=len(data_loader),miniters=50):
@@ -58,6 +61,6 @@ if __name__ == '__main__':
             pred = pred.cpu().detach().numpy()
             batch_size = features.shape[0]
             for j,(f, l, p) in enumerate(zip(features, label, pred)):
-                os.makedirs(f"{config.train.dataset.path.replace('GenImage','features')}/{generator}/{'ai' if l==0 else 'real'}", exist_ok=True)
-                np.save(f"{config.train.dataset.path.replace('GenImage','features')}/{generator}/{'ai' if l==0 else 'real'}/{i*batch_size+j}_{p[0]}.npy", f)
+                os.makedirs(f"{config.train.dataset.path.replace('GenImage','features_no_pretrain')}/{generator}/{'ai' if l==0 else 'real'}", exist_ok=True)
+                np.save(f"{config.train.dataset.path.replace('GenImage','features_no_pretrain')}/{generator}/{'ai' if l==0 else 'real'}/{i*batch_size+j}_{p[0]}.npy", f)
 

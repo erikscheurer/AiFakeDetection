@@ -64,7 +64,7 @@ if __name__ == '__main__':
                 for key in model_out:
                     if key == 'output':
                         output = model_out[key]
-                        logger.log_accuracy(output, model.label, model.total_steps, from_logits=True)
+                        logger.log_accuracy(output.squeeze(), model.label, model.total_steps, from_logits=True)
                     else:
                         logger.add_scalar(key, model_out[key], model.total_steps)
                 logger.add_scalar('lr', model.optimizer.param_groups[0]['lr'], model.total_steps)

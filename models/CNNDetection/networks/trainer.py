@@ -15,7 +15,7 @@ class Trainer(BaseModel):
 
         self.isDANN = opt.train.DANN if hasattr(opt.train, 'DANN') else False
         if self.isTrain and not opt.train.continue_train:
-            self.model = resnet50(pretrained=True, DANN_output=self.isDANN)
+            self.model = resnet50(pretrained=False, DANN_output=True)
             self.model.fc = nn.Linear(2048, 1)
             torch.nn.init.normal_(self.model.fc.weight.data, 0.0, 0.02)
 
@@ -67,6 +67,7 @@ class Trainer(BaseModel):
         self.input = input[0].to(self.device)
         self.label = input[1].to(self.device).float()
         self.generator_label = input[2].to(self.device).float()
+        return self.input, self.label, self.generator_label
 
 
     def forward(self, inputs=None):
@@ -98,7 +99,7 @@ class Trainer(BaseModel):
         self.loss = self.classify_loss
 
         if self.isDANN:
-            self.DANN_loss = self.DANN_lossfn(self.DANN_output.squeeze(1)[self.generator_label!=-1], self.generator_label[self.generator_label!=-1])
+            self.DANN_loss = self.DANN_lossfn(self.DANN_output.squeeze(1)[self.generator_label!=-1], self.generator_label[self.generator_label!=-1].long())
             self.loss += self.DANN_loss * self.DANN_tradeoff
         self.optimizer.zero_grad()
         self.loss.backward()
