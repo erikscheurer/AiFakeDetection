@@ -1,5 +1,9 @@
 # Ai Fake Detection
 
+## Notes for Tutors:
+Our code is distributed along three branches, main, DANN and DataAugmentations. The main branch contains code for the 7/8 training (pre and not pretrained is set [in model code](models/CNNDetection/networks/resnet.py#189)) and Fourier training. The rest can be set [in the config](models/CNNDetection/train.yaml).
+We also have the F3Net model implemented in this repo even though it is not mentioned in the report, for time reasons and because we wanted to stay consistent with a single model.
+
 ## Choices
 
 - 2 Datasets: GenImage, Cifake
@@ -15,20 +19,17 @@
 
 
 ## Todo
-- [ ] Data
-    - [ ] Dataloader for Tiny GenImage / GenImage (Erik)
-    - [ ] Download full GenImage dataset (Lukas)
-- [ ] Netzwerke
-    - [ ] implementierungen aus GenImage Repo bzw die aus dem Paper (Yannik)
+- [x] Data
+    - [x] Dataloader for Tiny GenImage / GenImage
+    - [x] Download full GenImage dataset
+- [x] Netzwerke
+    - [ ] implementierungen aus GenImage Repo bzw die aus dem Paper
         - Implementierungen angucken und bewerten wie sinnvoll die für uns sind (aka wie einfach kann man sie für uns anpassen)
         - Auf einen einfachen dataloader mal anwenden
     - [ ] Trainingsskripte
 - [ ] Evaluation
     - [ ] Generalisierungs-performance
     - [ ] Vergleiche verschiedene Modelle
-
-## Fragen an die Tutoren
-- [x] Wie ist das mit parallel processing auf dem bw uni cluster, wie bekommt man grafikkarten zugewiesen? -> partition gpu_4 oder gpu_8 und dann --gres=gpu:1
 
 ## Setup
 
