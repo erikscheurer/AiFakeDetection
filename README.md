@@ -3,6 +3,7 @@
 ## Notes for Tutors:
 Our code is distributed along three branches, main, DANN and DataAugmentations. The main branch contains code for the 7/8 training (pre and not pretrained is set [in model code](models/CNNDetection/networks/resnet.py#189)) and Fourier training. The rest can be set [in the config](models/CNNDetection/train.yaml).
 We also have the F3Net model implemented in this repo even though it is not mentioned in the report, for time reasons and because we wanted to stay consistent with a single model.
+The training for the models is in the [folder of the specific model](models/CNNDetection/train.py).
 
 ## Choices
 
