@@ -7,7 +7,7 @@ from networks.base_model import BaseModel
 
 class Trainer(BaseModel):
     def name(self):
-        return 'Trainer'
+        return "Trainer"
 
     def __init__(self, opt):
         super(Trainer, self).__init__(opt)
@@ -23,36 +23,53 @@ class Trainer(BaseModel):
         if self.isTrain:
             self.loss_fn = nn.BCEWithLogitsLoss()
             # initialize optimizers
-            if opt.train.optim == 'adam':
-                self.optimizer = torch.optim.Adam(self.model.parameters(),
-                                                  lr=opt.train.lr, betas=(opt.train.beta1, 0.999))
-            elif opt.train.optim == 'sgd':
-                self.optimizer = torch.optim.SGD(self.model.parameters(),
-                                                 lr=opt.train.lr, momentum=0.0, weight_decay=0)
+            if opt.train.optim == "adam":
+                self.optimizer = torch.optim.Adam(
+                    self.model.parameters(),
+                    lr=opt.train.lr,
+                    betas=(opt.train.beta1, 0.999),
+                )
+            elif opt.train.optim == "sgd":
+                self.optimizer = torch.optim.SGD(
+                    self.model.parameters(),
+                    lr=opt.train.lr,
+                    momentum=0.0,
+                    weight_decay=0,
+                )
             else:
                 raise ValueError("optim should be [adam, sgd]")
-        
+
         # lr scheduler
-        if not hasattr(opt.train, 'lr_policy') or opt.train.lr_policy == 'constant':
+        if not hasattr(opt.train, "lr_policy") or opt.train.lr_policy == "constant":
             self.lr_scheduler = torch.optim.lr_scheduler.ConstantLR(self.optimizer)
-        elif opt.train.lr_policy == 'step':
-            self.lr_scheduler = torch.optim.lr_scheduler.StepLR(self.optimizer, step_size=opt.train.lr_decay_epoch, gamma=0.1)
-        elif opt.train.lr_policy == 'plateau':
-            self.lr_scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(self.optimizer, mode='min', factor=0.1, patience=opt.train.lr_decay_epoch, verbose=True)
+        elif opt.train.lr_policy == "step":
+            self.lr_scheduler = torch.optim.lr_scheduler.StepLR(
+                self.optimizer, step_size=opt.train.lr_decay_epoch, gamma=0.1
+            )
+        elif opt.train.lr_policy == "plateau":
+            self.lr_scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(
+                self.optimizer,
+                mode="min",
+                factor=0.1,
+                patience=opt.train.lr_decay_epoch,
+                verbose=True,
+            )
         else:
             raise ValueError("Unknown lr policy")
 
         if not self.isTrain or opt.train.continue_train:
             self.load_networks(opt.train.epoch)
 
-        self.device = torch.device('cuda:{}'.format(opt.gpu_ids[0])) if opt.gpu_ids else torch.device('cpu')
+        self.device = (
+            torch.device("cuda:{}".format(opt.gpu_ids[0]))
+            if opt.gpu_ids
+            else torch.device("cpu")
+        )
         self.model.to(self.device)
-
 
     def set_input(self, input):
         self.input = input[0].to(self.device)
         self.label = input[1].to(self.device).float()
-
 
     def forward(self, inputs=None):
         if inputs is not None:

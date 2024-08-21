@@ -1,6 +1,19 @@
-from pytorch_grad_cam import GradCAM, HiResCAM, ScoreCAM, GradCAMPlusPlus, AblationCAM, XGradCAM, EigenCAM, FullGrad
-from pytorch_grad_cam.utils.model_targets import ClassifierOutputTarget, BinaryClassifierOutputTarget
+from pytorch_grad_cam import (
+    GradCAM,
+    HiResCAM,
+    ScoreCAM,
+    GradCAMPlusPlus,
+    AblationCAM,
+    XGradCAM,
+    EigenCAM,
+    FullGrad,
+)
+from pytorch_grad_cam.utils.model_targets import (
+    ClassifierOutputTarget,
+    BinaryClassifierOutputTarget,
+)
 from pytorch_grad_cam.utils.image import show_cam_on_image
+
 # from torchvision.models import resnet50
 # import torchvision
 # import torch
@@ -46,17 +59,17 @@ from config import load_config
 from datasets import create_dataloader
 import matplotlib.pyplot as plt
 
-config = load_config('models/CNNDetection/train.yaml')
+config = load_config("models/CNNDetection/train.yaml")
 data_loader = create_dataloader(
     data_path=config.train.dataset.path,
     dataset=config.train.dataset.name,
-    split='train',
+    split="train",
     batch_size=config.train.batch_size,
-    num_workers=config.train.num_workers
+    num_workers=config.train.num_workers,
 )
 
 model = Trainer(config)
-model.load_networks('latest')
+model.load_networks("latest")
 
 # Construct the CAM object
 target_layers = [model.model.layer4[-1]]
@@ -75,9 +88,9 @@ for i in range(len(grayscale_cam)):
 
 plt.figure(figsize=(23, 20))
 for i in range(10):
-    plt.subplot(2, 5, i+1)
+    plt.subplot(2, 5, i + 1)
     plt.imshow(visualizations[i])
     plt.title(f"Label: {'AI' if labels[i] == 0 else 'Nature'}")
-    plt.axis('off')
+    plt.axis("off")
 plt.tight_layout()
 plt.show()

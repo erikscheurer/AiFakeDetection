@@ -5,6 +5,7 @@ from PIL import Image
 import PIL
 from tqdm import tqdm
 
+
 # save list of faulty images to file
 def save(list_of_wrong_images):
     try:
@@ -13,6 +14,7 @@ def save(list_of_wrong_images):
                 f.write(image + "\n")
     except:
         print(list_of_wrong_images)
+
 
 list_of_wrong_images = []
 # all png, jpeg, jpg images
@@ -36,4 +38,3 @@ for file in tqdm(glob.iglob("data/GenImage/*/*/*/*/*.jpg")):
     except PIL.UnidentifiedImageError:
         list_of_wrong_images.append(file)
         save(list_of_wrong_images)
-
