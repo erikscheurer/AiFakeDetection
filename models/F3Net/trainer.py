@@ -9,18 +9,26 @@ import os
 
 def initModel(mod, gpu_ids):
     if gpu_ids:
-        mod = mod.to(f'cuda:{gpu_ids[0]}')
+        mod = mod.to(f"cuda:{gpu_ids[0]}")
         mod = nn.DataParallel(mod, gpu_ids)
     return mod
 
-class Trainer(): 
+
+class Trainer:
     def __init__(self, gpu_ids, mode, pretrained_path):
-        self.device = torch.device('cuda:{}'.format(gpu_ids[0])) if gpu_ids else torch.device('cpu')
+        self.device = (
+            torch.device("cuda:{}".format(gpu_ids[0]))
+            if gpu_ids
+            else torch.device("cpu")
+        )
         self.model = F3Net(mode=mode, device=self.device)
         self.model = initModel(self.model, gpu_ids)
         self.loss_fn = nn.BCEWithLogitsLoss()
-        self.optimizer = torch.optim.Adam(filter(lambda p: p.requires_grad, self.model.parameters()),
-                                              lr=0.0002, betas=(0.9, 0.999))
+        self.optimizer = torch.optim.Adam(
+            filter(lambda p: p.requires_grad, self.model.parameters()),
+            lr=0.0002,
+            betas=(0.9, 0.999),
+        )
         # self.optimizer = torch.optim.SGD(filter(lambda p: p.requires_grad, self.model.parameters()),
         #                                         lr=0.002, momentum=0.9, weight_decay=0)
 
@@ -32,13 +40,15 @@ class Trainer():
         fea, out = self.model(x)
         del fea
         return out
-    
+
     def optimize_weight(self):
         stu_fea, stu_cla = self.model(self.input)
 
         # changed self.label to self.label.float() because otherwise:
         # RuntimeError: result type Float can't be cast to the desired output type Long
-        self.loss_cla = self.loss_fn(stu_cla.squeeze(1), self.label.float()) # classify loss
+        self.loss_cla = self.loss_fn(
+            stu_cla.squeeze(1), self.label.float()
+        )  # classify loss
         self.loss = self.loss_cla
 
         self.optimizer.zero_grad()

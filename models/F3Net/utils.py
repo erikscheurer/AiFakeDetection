@@ -10,17 +10,28 @@ import logging
 from tqdm import tqdm
 
 
-def evaluate_GenImage(model, data_path, generators = None, split = 'val', batch_size = 64, val_size = 1000):
+def evaluate_GenImage(
+    model, data_path, generators=None, split="val", batch_size=64, val_size=1000
+):
     from datasets import create_dataloader
 
     # torch.cache.empty_cache()
     with torch.no_grad():
         y_true, y_pred = [], []
 
-        dataloader = create_dataloader(data_path, 'GenImage', split, batch_size, num_workers=4, shuffle=True, target_size=(299,299), generators_allowed=generators)
-        for i,(img, label, generator_label) in enumerate(tqdm(dataloader)):
+        dataloader = create_dataloader(
+            data_path,
+            "GenImage",
+            split,
+            batch_size,
+            num_workers=4,
+            shuffle=True,
+            target_size=(299, 299),
+            generators_allowed=generators,
+        )
+        for i, (img, label, generator_label) in enumerate(tqdm(dataloader)):
 
-            if i>=val_size:
+            if i >= val_size:
                 break
             img = img.detach().to(model.device)
             features, output = model.forward(img)
@@ -28,11 +39,11 @@ def evaluate_GenImage(model, data_path, generators = None, split = 'val', batch_
             y_true.extend(label.flatten().tolist())
 
     y_true, y_pred = np.array(y_true), np.array(y_pred)
-    fpr, tpr, thresholds = roc_curve(y_true,y_pred,pos_label=1)
+    fpr, tpr, thresholds = roc_curve(y_true, y_pred, pos_label=1)
     AUC = cal_auc(fpr, tpr)
 
-    idx_real = np.where(y_true==1)[0] # 1 for real
-    idx_fake = np.where(y_true==0)[0] # 0 for fake
+    idx_real = np.where(y_true == 1)[0]  # 1 for real
+    idx_fake = np.where(y_true == 0)[0]  # 0 for fake
 
     assert len(idx_real) > 0, f"No real images found: {y_true}"
     assert len(idx_fake) > 0, f"No fake images found: {y_true}"
@@ -47,11 +58,12 @@ def evaluate_GenImage(model, data_path, generators = None, split = 'val', batch_
 # python 3.7
 """Utility functions for logging."""
 
-__all__ = ['setup_logger']
+__all__ = ["setup_logger"]
 
-DEFAULT_WORK_DIR = 'results'
+DEFAULT_WORK_DIR = "results"
 
-def setup_logger(work_dir=None, logfile_name='log.txt', logger_name='logger'):
+
+def setup_logger(work_dir=None, logfile_name="log.txt", logger_name="logger"):
     """Sets up logger from target work directory.
 
     The function will sets up a logger with `DEBUG` log level. Two handlers will
@@ -79,9 +91,11 @@ def setup_logger(work_dir=None, logfile_name='log.txt', logger_name='logger'):
 
     logger = logging.getLogger(logger_name)
     if logger.hasHandlers():  # Already existed
-        raise SystemExit(f'Logger name `{logger_name}` has already been set up!\n'
-                            f'Please use another name, or otherwise the messages '
-                            f'may be mixed between these two loggers.')
+        raise SystemExit(
+            f"Logger name `{logger_name}` has already been set up!\n"
+            f"Please use another name, or otherwise the messages "
+            f"may be mixed between these two loggers."
+        )
 
     logger.setLevel(logging.DEBUG)
     formatter = logging.Formatter("[%(asctime)s][%(levelname)s] %(message)s")
